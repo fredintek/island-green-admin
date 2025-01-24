@@ -11,22 +11,47 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Avatar, ConfigProvider, Input } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type Props = {};
 
 const Navbar = (props: Props) => {
   const dispatch = useAppDispatch();
+  const [isNavbarOpen, setIsNavbarOpen] = useState<boolean>(false);
   const { isNavCollapsed, isDark } = useAppSelector((state) => state.sidebar);
   const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width:768px)");
+
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setIsNavbarOpen(false);
+      }
+    };
+
+    // Add listener for media query changes
+
+    mediaQuery.addEventListener("change", handleMediaChange);
+
+    // Set initial state based on the current screen size
+    if (mediaQuery.matches) {
+      setIsNavbarOpen(false);
+    }
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleMediaChange);
+    };
+  }, []);
+
   return (
-    <nav className="h-[74px] w-dvw border">
+    <nav className="relative h-[80px] w-dvw bg-white shadow-nav-shadow z-30">
       <div className="mx-auto max-w-[1440px] w-[90%] h-full flex items-center justify-between">
         {/* left */}
         <div className="flex items-center gap-6">
           {/* logo */}
-          <div className="w-[140px] h-[70px] shrink-0">
-            <Link href={"/"} className="">
+          <div className="w-[130px] h-[65px] shrink-0">
+            <Link href="/" className="">
               <img
                 alt="logo"
                 src={"/images/island-green-logo.png"}
@@ -40,7 +65,7 @@ const Navbar = (props: Props) => {
             <VerticalRightOutlined
               onClick={() => dispatch(toggleNavbar(undefined))}
               className={`text-[#828282] cursor-pointer ${
-                isNavCollapsed ? "rotate-180" : "rotate-0"
+                isNavCollapsed ? "rotate-0" : "rotate-180"
               } transition-transform duration-300 ease-in-out`}
             />
           </div>
@@ -75,7 +100,7 @@ const Navbar = (props: Props) => {
               }}
             >
               <Input
-                placeholder="Search galleries, exhibitions..."
+                placeholder="Search..."
                 className="nav-search-input text-[#464646] text-sm leading-5 w-full h-[40px]"
                 size="large"
                 value={searchValue}
@@ -113,10 +138,22 @@ const Navbar = (props: Props) => {
           />
 
           {/* hamburger icon */}
-          <div className="block md:hidden">
+          <div
+            onClick={() => setIsNavbarOpen(!isNavbarOpen)}
+            className="block md:hidden"
+          >
             <FontAwesomeIcon icon={faBars} className="cursor-pointer" />
           </div>
         </div>
+      </div>
+
+      {/* hamburger menu */}
+      <div
+        className={`absolute top-full w-full min-h-[250px] bg-white shadow-nav-shadow ${
+          isNavbarOpen ? "translate-x-0" : "translate-x-full"
+        } transition-all duration-300 ease-in-out flex flex-col gap-6 items-center justify-center border-t py-4`}
+      >
+        <p>Profile</p>
       </div>
     </nav>
   );

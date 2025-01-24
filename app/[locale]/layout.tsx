@@ -34,16 +34,17 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
-      <body className={`antialiased flex flex-col min-h-[100dvh]`}>
+      <body
+        className={`antialiased flex flex-col min-h-[100dvh] overflow-hidden`}
+      >
         <NextIntlClientProvider messages={messages}>
           <ReduxProvider>
             <Navbar />
             <div className="flex-1 flex">
               {/* sidebar */}
               <Sidebar />
-
               {/* content */}
-              <main className="bg-blue-500 flex-1">{children}</main>
+              <main className="border flex-1 m-4">{children}</main>
             </div>
           </ReduxProvider>
         </NextIntlClientProvider>
