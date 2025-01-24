@@ -11,6 +11,8 @@ import {
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { apiSlice } from "./api";
+import { navbarReducer } from "./slices";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 type NoopStorage = {
   getItem: (key: string) => Promise<null>;
@@ -45,6 +47,7 @@ const persistConfig = {
 // combine redusers for different slices
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
+  sidebar: navbarReducer,
 });
 
 // persist reducer
@@ -67,4 +70,6 @@ setupListeners(store.dispatch);
 // define types for root state and app dispatch
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export default store;

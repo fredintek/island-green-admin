@@ -23,3 +23,7 @@ body {
     text-wrap: balance;
   }
 }
+
+.nav-search-input {
+  padding: 7px 30px 7px 30px!important;
+}

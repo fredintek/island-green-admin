@@ -1,3 +1,6 @@
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoAddCss = false;
 import type { Metadata } from "next";
 import "./globals.css";
 import { notFound } from "next/navigation";
@@ -5,6 +8,8 @@ import { routing } from "@/i18n/routing";
 import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import ReduxProvider from "@/redux/ReduxProvider";
+import Navbar from "@/components/navbar/Navbar";
+import Sidebar from "@/components/sidebar/Sidebar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -31,7 +36,16 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className={`antialiased flex flex-col min-h-[100dvh]`}>
         <NextIntlClientProvider messages={messages}>
-          <ReduxProvider>{children}</ReduxProvider>
+          <ReduxProvider>
+            <Navbar />
+            <div className="flex-1 flex">
+              {/* sidebar */}
+              <Sidebar />
+
+              {/* content */}
+              <main className="bg-blue-500 flex-1">{children}</main>
+            </div>
+          </ReduxProvider>
         </NextIntlClientProvider>
       </body>
     </html>
