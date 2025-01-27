@@ -18,6 +18,21 @@ body {
   font-style: normal;
 }
 
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00000040;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -26,4 +41,32 @@ body {
 
 .nav-search-input {
   padding: 7px 30px 7px 30px!important;
+}
+
+.ant-menu.ant-menu-inline-collapsed {
+  width: 70px !important;
+}
+
+.ant-menu-submenu-title {
+
+  padding-inline: 25px !important;
+}
+
+.ant-menu-submenu-title:hover {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+.ant-menu-title-content a {
+  transition: none !important;
+}
+
+.ant-menu-item {
+  padding-inline: 25px !important;
+  margin-inline: 0px !important;
+  width: 100% !important;
+}
+
+.ant-menu-submenu.ant-menu-submenu-popup {
+  left: 70px !important
 }

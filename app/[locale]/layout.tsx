@@ -18,11 +18,13 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params: { locale },
+  params,
 }: Readonly<{
   children: React.ReactNode;
   params: { locale: string };
 }>) {
+  // Await `params` properly
+  const { locale } = await params;
   // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
     notFound();
@@ -40,11 +42,13 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <ReduxProvider>
             <Navbar />
-            <div className="flex-1 flex">
+            <div className="flex-1 flex min-h-[calc(100dvh-80px)] mt-[80px]">
               {/* sidebar */}
               <Sidebar />
               {/* content */}
-              <main className="border flex-1 m-4">{children}</main>
+              <main className="border flex-1 m-4 bg-gray-200 p-4">
+                {children}
+              </main>
             </div>
           </ReduxProvider>
         </NextIntlClientProvider>
