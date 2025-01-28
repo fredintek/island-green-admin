@@ -79,3 +79,7 @@ body {
 .ql-container {
   height: 250px !important;
 }
+
+.ant-modal {
+  top: 10px !important;
+}
