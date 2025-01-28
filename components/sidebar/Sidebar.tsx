@@ -2,36 +2,19 @@
 import { Link } from "@/i18n/routing";
 import { useAppSelector } from "@/redux/store";
 import {
+  FolderOutlined,
   HomeOutlined,
   IdcardOutlined,
   PhoneOutlined,
   QuestionOutlined,
+  ReadOutlined,
+  RotateLeftOutlined,
 } from "@ant-design/icons";
-import { faAddressCard } from "@fortawesome/free-regular-svg-icons";
-import { faHouse, faQuestion, faTty } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { v4 as uuidv4 } from "uuid";
 import { ConfigProvider, Menu } from "antd";
 import React, { useState } from "react";
 
 type Props = {};
-
-const sidebarOptions = [
-  {
-    icon: faHouse,
-    label: "Home",
-    to: "/",
-  },
-  {
-    icon: faQuestion,
-    label: "FAQ",
-    to: "/faq",
-  },
-  {
-    icon: faTty,
-    label: "Communication",
-    to: "/communication",
-  },
-];
 
 const menuItems = [
   {
@@ -39,6 +22,93 @@ const menuItems = [
     label: "Home",
     icon: <HomeOutlined />,
     link: "/",
+  },
+  {
+    key: "about",
+    label: "About",
+    icon: <IdcardOutlined />,
+    items: [
+      { key: "about-who", label: "Who Are We", link: "/about/who-are-you" },
+      { key: "about-news", label: "News", link: "/about/news" },
+      {
+        key: "open-position",
+        label: "Position",
+        // link: "/about/open-positions",
+      },
+    ],
+  },
+  {
+    key: "projects",
+    label: "Projects",
+    icon: <FolderOutlined />,
+    items: [
+      {
+        key: "projects-green-and-blue",
+        label: "Green And Blue",
+        link: "/projects/green-and-blue",
+      },
+      {
+        key: "projects-yalusa-homes",
+        label: "Yalusa Homes",
+        link: "/projects/yalusa-homes",
+      },
+      {
+        key: "projects-aquamarine",
+        label: "Aquamarine Bosphorus Mansion",
+        link: "/projects/aquamarine",
+      },
+    ],
+  },
+  {
+    key: "360",
+    label: "360",
+    icon: <RotateLeftOutlined />,
+    items: [
+      {
+        key: "360-green-and-blue",
+        label: "Green And Blue",
+        link: "/360/green-and-blue",
+      },
+      {
+        key: "360-yalusa-homes",
+        label: "Yalusa Homes",
+        link: "/360/yalusa-homes",
+      },
+      {
+        key: "360-aquamarine",
+        label: "Aquamarine Bosphorus Mansion",
+        link: "/360/aquamarine",
+      },
+    ],
+  },
+  {
+    key: "blog",
+    label: "Blog",
+    icon: <ReadOutlined />,
+    items: [
+      {
+        key: "north-cyprus-about",
+        label: "About Northern Cyprus",
+        link: "/blog/north-cyprus-about",
+      },
+      {
+        key: "secret-paradise",
+        label: "The Hidden Paradise of Northern Cyprus:Karpaz Peninsula",
+        link: "/blog/secret-paradise",
+      },
+      {
+        key: "buying-guide",
+        label:
+          "Real Estate Buying Guide in Northern Cyprus:Investment and Living Opportunities",
+        link: "/blog/buying-guide",
+      },
+      {
+        key: "investment-opportunities",
+        label:
+          "Investment Opportunities in Northern Cyprus:The Shining Future of the Sunny Island",
+        link: "/blog/investment-opportunities",
+      },
+    ],
   },
   {
     key: "faq",
@@ -49,50 +119,48 @@ const menuItems = [
   {
     key: "communication",
     label: "Communication",
-    icon: <PhoneOutlined />,
+    icon: <PhoneOutlined className="rotate-180" />,
     link: "/communication",
-  },
-  {
-    key: "about",
-    label: "About",
-    icon: <IdcardOutlined />,
-    children: [
-      { key: "about-who", label: "Who Are We", link: "/who-are-you" },
-      { key: "about-news", label: "News", link: "/news" },
-      { key: "open-position", label: "Position", link: "/open-positions" },
-    ],
   },
 ];
 
 const Sidebar = (props: Props) => {
   const { isNavCollapsed } = useAppSelector((state) => state.sidebar);
   const [activeSidebar, setIsActiveSidebar] = useState("");
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
 
   // Render menu items recursively
   const renderMenuItems = (items: any) =>
     items.map((item: any) => {
-      if (item.children) {
-        return (
-          <Menu.SubMenu
-            key={item.key}
-            icon={item.icon}
-            title={!isNavCollapsed && item.label}
-          >
-            {renderMenuItems(item.children)}
-          </Menu.SubMenu>
-        );
+      if (item.items) {
+        return {
+          key: item.key,
+          icon: item.icon,
+          label: item.label,
+          children: renderMenuItems(item.items),
+        };
       }
 
-      return (
-        <Menu.Item key={item.key} icon={item.icon || <></>}>
-          {item.link ? (
-            <Link href={item.link}>{item.label}</Link>
-          ) : (
-            <p>{item.label}</p>
-          )}
-        </Menu.Item>
-      );
+      return {
+        key: item.key,
+        icon: item.icon,
+        label: item.link ? (
+          <Link href={item.link}>{item.label}</Link>
+        ) : (
+          item.label
+        ),
+      };
     });
+
+  // Handle submenu open change
+  const handleOpenChange = (keys: string[]) => {
+    // Ensure only one menu is open at a time
+    if (keys.length > 1) {
+      setOpenKeys([keys[keys.length - 1]]);
+    } else {
+      setOpenKeys(keys);
+    }
+  };
 
   return (
     <div
@@ -110,12 +178,13 @@ const Sidebar = (props: Props) => {
             components: {
               Menu: {
                 borderRadiusLG: 0,
-                controlHeightLG: 60,
                 itemHoverBg: "#ef4444",
                 itemSelectedBg: "#ef4444",
                 itemHoverColor: "white",
                 itemSelectedColor: "white",
                 subMenuItemSelectedColor: "#ef4444",
+                subMenuItemBg: "#e5e7eb",
+                itemHeight: 60,
               },
             },
           }}
@@ -125,9 +194,10 @@ const Sidebar = (props: Props) => {
             theme="light"
             inlineCollapsed={isNavCollapsed}
             className="text-base"
-          >
-            {renderMenuItems(menuItems)}
-          </Menu>
+            items={renderMenuItems(menuItems)}
+            openKeys={openKeys}
+            onOpenChange={handleOpenChange}
+          />
         </ConfigProvider>
       </div>
     </div>

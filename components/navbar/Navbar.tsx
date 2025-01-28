@@ -46,7 +46,7 @@ const Navbar = (props: Props) => {
 
   return (
     <nav className="fixed left-0 top-0 h-[80px] w-dvw bg-white shadow-nav-shadow z-30">
-      <div className="mx-auto max-w-[1440px] w-[90%] h-full flex items-center justify-between">
+      <div className="mx-auto w-full px-8 h-full flex items-center justify-between">
         {/* left */}
         <div className="flex items-center gap-6">
           {/* logo */}

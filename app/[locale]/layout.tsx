@@ -42,11 +42,11 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <ReduxProvider>
             <Navbar />
-            <div className="flex-1 flex min-h-[calc(100dvh-80px)] mt-[80px]">
+            <div className="flex-1 flex h-[calc(100dvh-80px)] mt-[80px]">
               {/* sidebar */}
               <Sidebar />
               {/* content */}
-              <main className="border flex-1 m-4 bg-gray-200 p-4">
+              <main className="flex-1 m-4 h-[calc(100dvh-80px-32px)] bg-gray-200 p-4 overflow-y-auto">
                 {children}
               </main>
             </div>

@@ -7,6 +7,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --secondary-shade: #1d5745;
 }
 
 body {
@@ -69,4 +70,12 @@ body {
 
 .ant-menu-submenu.ant-menu-submenu-popup {
   left: 70px !important
+}
+
+:where(.css-dev-only-do-not-override-1htoz2s).ant-upload-wrapper .ant-upload-drag:not(.ant-upload-disabled):hover {
+  border-color: transparent;
+}
+
+.ql-container {
+  height: 250px !important;
 }
