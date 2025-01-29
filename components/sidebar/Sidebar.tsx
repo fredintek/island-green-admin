@@ -1,5 +1,5 @@
 "use client";
-import { Link } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/routing";
 import { useAppSelector } from "@/redux/store";
 import {
   FolderOutlined,
@@ -33,7 +33,7 @@ const menuItems = [
       {
         key: "open-position",
         label: "Position",
-        // link: "/about/open-positions",
+        link: "/about/open-positions",
       },
     ],
   },
@@ -128,6 +128,8 @@ const Sidebar = (props: Props) => {
   const { isNavCollapsed } = useAppSelector((state) => state.sidebar);
   const [activeSidebar, setIsActiveSidebar] = useState("");
   const [openKeys, setOpenKeys] = useState<string[]>([]);
+  const pathname = usePathname();
+  console.log("pathname", pathname);
 
   // Render menu items recursively
   const renderMenuItems = (items: any) =>

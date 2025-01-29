@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Input,
   Form,
@@ -74,23 +74,30 @@ const ProjectsSection = (props: Props) => {
       ],
     },
   ]);
+  const [fileList, setFileList] = useState<any[]>([]);
   const [form] = Form.useForm();
 
   const handleUploadChange = ({ fileList }: any) => {
     console.log("Uploaded files: ", fileList);
+    setFileList(fileList);
   };
 
   const handleEdit = (record: Project) => {
+    form.setFieldsValue(record);
     setEditingProject(record);
     setProjectModal(true);
-    form.setFieldsValue(record);
   };
 
   const handleDelete = (record: Project) => {
     setProjectsData((prev) => prev.filter((project) => project !== record));
   };
 
-  const handleFormSubmit = (values: Project) => {
+  const handleFormSubmit = (values: any) => {
+    console.log("values", values);
+    values.images =
+      fileList.length > 0
+        ? fileList.map((file) => file.originFileObj || file.url)
+        : editingProject?.images;
     if (editingProject) {
       setProjectsData((prev) =>
         prev.map((project) =>
@@ -150,6 +157,25 @@ const ProjectsSection = (props: Props) => {
     },
   ];
 
+  useEffect(() => {
+    if (editingProject) {
+      setFileList(
+        editingProject.images.map((url, index) => ({
+          uid: index.toString(),
+          name: `Image${index + 1}`,
+          status: "done",
+          url,
+        }))
+      );
+    } else {
+      setFileList([]); // Reset when adding a new project
+    }
+  }, [editingProject]);
+
+  useEffect(() => {
+    form.setFieldsValue({ images: fileList });
+  }, [fileList, form]);
+
   return (
     <>
       <div className="p-6 bg-white shadow-md rounded-md">
@@ -161,8 +187,8 @@ const ProjectsSection = (props: Props) => {
           <button
             onClick={() => {
               setProjectModal(true);
-              form.resetFields();
               setEditingProject(null);
+              form.resetFields();
             }}
             type="button"
             className="mb-4 px-6 py-2 rounded-md text-white cursor-pointer flex gap-2 items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade transition-colors duration-300"
@@ -173,7 +199,6 @@ const ProjectsSection = (props: Props) => {
           <Table
             columns={projectsColumn}
             dataSource={projectsData}
-            rowKey="titleEn"
             scroll={{ x: 768 }}
           />
         </div>
@@ -181,8 +206,14 @@ const ProjectsSection = (props: Props) => {
 
       {/* add/edit project */}
       <Modal
-        onCancel={() => setProjectModal(false)}
-        onClose={() => setProjectModal(false)}
+        onCancel={() => {
+          setProjectModal(false);
+          setEditingProject(null);
+        }}
+        onClose={() => {
+          setProjectModal(false);
+          setEditingProject(null);
+        }}
         open={openProjectModal}
         width={{
           xs: "100%",
@@ -240,19 +271,6 @@ const ProjectsSection = (props: Props) => {
 
           <Form.Item
             name="images"
-            rules={[
-              {
-                validator: (_, value) => {
-                  const files = value || [];
-                  if (files.length !== 2) {
-                    return Promise.reject(
-                      new Error("Exactly 2 images are required.")
-                    );
-                  }
-                  return Promise.resolve();
-                },
-              },
-            ]}
             label="Upload 2 Images"
             valuePropName="fileList"
             getValueFromEvent={(e) => {
@@ -270,14 +288,7 @@ const ProjectsSection = (props: Props) => {
               listType="picture-card"
               beforeUpload={() => false}
               maxCount={2}
-              defaultFileList={
-                editingProject?.images?.map((url: string, index: number) => ({
-                  uid: index.toString(),
-                  name: `Image${index + 1}`,
-                  status: "done",
-                  url,
-                })) || []
-              }
+              fileList={fileList}
             >
               <button
                 type="button"

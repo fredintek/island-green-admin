@@ -83,3 +83,7 @@ body {
 .ant-modal {
   top: 10px !important;
 }
+
+.ant-modal.normal-modal {
+  top: 100px !important;
+}
