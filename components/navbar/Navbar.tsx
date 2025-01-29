@@ -44,8 +44,16 @@ const Navbar = (props: Props) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDark]);
+
   return (
-    <nav className="fixed left-0 top-0 h-[80px] w-dvw bg-white shadow-nav-shadow z-30">
+    <nav className="fixed left-0 top-0 h-[80px] w-dvw bg-white dark:bg-[#1e293b] shadow-nav-shadow z-30">
       <div className="mx-auto w-full px-8 h-full flex items-center justify-between">
         {/* left */}
         <div className="flex items-center gap-6">
@@ -79,7 +87,7 @@ const Navbar = (props: Props) => {
               onClick={() => {
                 setSearchValue("");
               }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer z-10 w-5 h-5 shrink-0 flex justify-center items-center rounded-full bg-white"
+              className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer z-10 w-5 h-5 shrink-0 flex justify-center items-center rounded-full bg-white dark:bg-[#1e293b]"
             >
               <FontAwesomeIcon
                 icon={faX}
@@ -94,14 +102,14 @@ const Navbar = (props: Props) => {
                     hoverBorderColor: "transparent",
                     activeBorderColor: "black",
                     activeShadow: "none",
-                    colorBgContainer: "#F8F8F8",
+                    // colorBgContainer: "#F8F8F8",
                   },
                 },
               }}
             >
               <Input
                 placeholder="Search..."
-                className="nav-search-input text-[#464646] text-sm leading-5 w-full h-[40px]"
+                className="nav-search-input text-[#464646] !bg-[#F8F8F8] dark:!bg-gray-200 text-sm leading-5 w-full h-[40px]"
                 size="large"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
@@ -149,7 +157,7 @@ const Navbar = (props: Props) => {
 
       {/* hamburger menu */}
       <div
-        className={`absolute top-full w-full min-h-[250px] bg-white shadow-nav-shadow ${
+        className={`absolute top-full w-full min-h-[250px] bg-white dark:bg-[#1e293b] shadow-nav-shadow ${
           isNavbarOpen ? "translate-x-0" : "translate-x-full"
         } transition-all duration-300 ease-in-out flex flex-col gap-6 items-center justify-center border-t py-4`}
       >

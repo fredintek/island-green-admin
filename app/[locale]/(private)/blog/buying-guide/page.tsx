@@ -1,0 +1,13 @@
+import React from "react";
+
+type Props = {};
+
+const page = (props: Props) => {
+  return (
+    <div>
+      <p>buying-guide</p>
+    </div>
+  );
+};
+
+export default page;

@@ -36,20 +36,22 @@ const ContactSection = (props: Props) => {
   };
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-md">
-      <p className="text-[22px] text-secondaryShade font-bold uppercase mb-6">
+    <div className="p-6 bg-white dark:bg-[#1e293b] shadow-md rounded-md">
+      <p className="text-[22px] text-secondaryShade dark:text-primaryShade font-bold uppercase mb-6">
         Contact Section
       </p>
 
       {/* content */}
       <div>
-        <p className="text-lg font-medium capitalize mb-2">Upload New Video</p>
-        <div className="border-2 border-secondaryShade border-dashed rounded-xl w-full">
+        <p className="text-lg text-black dark:text-gray-300 font-medium capitalize mb-2">
+          Upload New Video
+        </p>
+        <div className="border-2 border-secondaryShade dark:border-primaryShade border-dashed rounded-xl w-full">
           <Dragger {...draggerProps} className="">
             <p className="ant-upload-drag-icon">
-              <InboxOutlined className="!text-secondaryShade" />
+              <InboxOutlined className="!text-secondaryShade dark:!text-primaryShade" />
             </p>
-            <p className="ant-upload-text">
+            <p className="ant-upload-text !text-black dark:!text-gray-300">
               Click or drag video to this area to upload
             </p>
           </Dragger>
@@ -58,7 +60,7 @@ const ContactSection = (props: Props) => {
 
       <button
         type="button"
-        className="mt-2 ml-auto px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade transition-colors duration-300"
+        className="mt-2 ml-auto px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
       >
         <p className="uppercase font-medium">Submit</p>
       </button>

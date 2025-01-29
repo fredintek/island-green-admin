@@ -41,15 +41,15 @@ const UploadSection = (props: Props) => {
   };
 
   return (
-    <div className="flex flex-col p-6 bg-white shadow-md rounded-md">
-      <p className="text-[22px] text-[#1d5745] font-bold uppercase mb-2">
+    <div className="flex flex-col p-6 bg-white dark:bg-[#1e293b] shadow-md rounded-md">
+      <p className="text-[22px] text-secondaryShade dark:text-primaryShade font-bold uppercase mb-2">
         Hero Section
       </p>
       <div className="flex flex-col gap-6">
         {/* default hero images */}
         {(defaultImages?.length as number) > 0 && (
           <div>
-            <p className="text-lg font-medium capitalize mb-2">
+            <p className="text-lg text-black dark:text-gray-300 font-medium capitalize mb-2">
               Existing Hero Images
             </p>
             <div className="grid grid-cols-fluid gap-4">
@@ -72,18 +72,18 @@ const UploadSection = (props: Props) => {
 
         {/* upload new hero images */}
         <div>
-          <p className="text-lg font-medium capitalize mb-2">
+          <p className="text-lg text-black dark:text-gray-300 font-medium capitalize mb-2">
             Upload New Hero images
           </p>
-          <div className="border-2 border-secondaryShade border-dashed rounded-xl w-full">
+          <div className="border-2 border-secondaryShade dark:border-primaryShade border-dashed rounded-xl w-full">
             <Dragger {...draggerProps} className="">
               <p className="ant-upload-drag-icon">
-                <InboxOutlined className="!text-secondaryShade" />
+                <InboxOutlined className="!text-secondaryShade dark:!text-primaryShade" />
               </p>
-              <p className="ant-upload-text">
+              <p className="ant-upload-text !text-black dark:!text-gray-300">
                 Click or drag file to this area to upload
               </p>
-              <p className="ant-upload-hint">
+              <p className="ant-upload-hint !text-black dark:!text-gray-300">
                 Support for a single or bulk upload. Strictly prohibited from
                 uploading company data or other banned files.
               </p>
@@ -94,7 +94,7 @@ const UploadSection = (props: Props) => {
         {/* Submit Button */}
         <button
           type="button"
-          className="ml-auto px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade transition-colors duration-300"
+          className="ml-auto px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
         >
           <p className="uppercase font-medium">Submit</p>
         </button>

@@ -8,6 +8,7 @@
   --background: #ffffff;
   --foreground: #171717;
   --secondary-shade: #1d5745;
+  --primary-shade: #b5884c;
 }
 
 body {
@@ -48,9 +49,12 @@ body {
   width: 70px !important;
 }
 
-.ant-menu-submenu-title {
-
+/* .ant-menu-submenu-title {
   padding-inline: 25px !important;
+} */
+
+.ant-menu-submenu-title {
+    @apply !px-[25px] !text-black dark:!text-white;
 }
 
 .ant-menu-submenu-title:hover {
@@ -62,11 +66,15 @@ body {
   transition: none !important;
 }
 
-.ant-menu-item {
+/* .ant-menu-item {
   padding-inline: 25px !important;
   margin-inline: 0px !important;
   width: 100% !important;
-}
+} */
+
+.ant-menu-item {
+    @apply !px-[25px] !mx-0 !w-full !text-black dark:!text-white;
+  }
 
 .ant-menu-submenu.ant-menu-submenu-popup {
   left: 70px !important

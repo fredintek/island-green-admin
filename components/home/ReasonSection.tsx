@@ -148,8 +148,8 @@ const ReasonSection = (props: Props) => {
 
   return (
     <>
-      <div className="p-6 bg-white shadow-md rounded-md">
-        <p className="text-[22px] text-secondaryShade font-bold uppercase mb-6">
+      <div className="p-6 bg-white dark:bg-[#1e293b] shadow-md rounded-md">
+        <p className="text-[22px] text-secondaryShade dark:text-primaryShade font-bold uppercase mb-6">
           Reasons Section
         </p>
 
@@ -256,7 +256,7 @@ const ReasonSection = (props: Props) => {
           <button
             onClick={() => form.submit()}
             type="button"
-            className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade transition-colors duration-300"
+            className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade dark:text-primaryShade transition-colors duration-300"
           >
             <p className="uppercase font-medium">save</p>
           </button>

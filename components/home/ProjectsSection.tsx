@@ -178,8 +178,8 @@ const ProjectsSection = (props: Props) => {
 
   return (
     <>
-      <div className="p-6 bg-white shadow-md rounded-md">
-        <p className="text-[22px] text-secondaryShade font-bold uppercase mb-6">
+      <div className="p-6 bg-white dark:bg-[#1e293b] shadow-md rounded-md">
+        <p className="text-[22px] text-secondaryShade dark:text-primaryShade font-bold uppercase mb-6">
           Projects Section
         </p>
 
@@ -191,7 +191,7 @@ const ProjectsSection = (props: Props) => {
               form.resetFields();
             }}
             type="button"
-            className="mb-4 px-6 py-2 rounded-md text-white cursor-pointer flex gap-2 items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade transition-colors duration-300"
+            className="mb-4 px-6 py-2 rounded-md text-white cursor-pointer flex gap-2 items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
           >
             <PlusOutlined className="text-lg" />
             <p className="uppercase font-medium text-sm">Add Project</p>
@@ -200,6 +200,7 @@ const ProjectsSection = (props: Props) => {
             columns={projectsColumn}
             dataSource={projectsData}
             scroll={{ x: 768 }}
+            className=""
           />
         </div>
       </div>
@@ -292,7 +293,7 @@ const ProjectsSection = (props: Props) => {
             >
               <button
                 type="button"
-                className="p-1 rounded-md text-white cursor-pointer flex gap-2 items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade transition-colors duration-300"
+                className="p-1 rounded-md text-white cursor-pointer flex gap-2 items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade dark:text-primaryShade transition-colors duration-300"
               >
                 <UploadOutlined className="text-lg" />
                 <p className="uppercase font-medium text-sm">Upload</p>
@@ -302,7 +303,7 @@ const ProjectsSection = (props: Props) => {
             <button
               onClick={() => form.submit()}
               type="button"
-              className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade transition-colors duration-300"
+              className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade dark:text-primaryShade transition-colors duration-300"
             >
               <p className="uppercase font-medium">
                 {editingProject ? "Update Project" : "Add Project"}

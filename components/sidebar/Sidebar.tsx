@@ -12,7 +12,7 @@ import {
 } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
 import { ConfigProvider, Menu } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type Props = {};
 
@@ -28,7 +28,7 @@ const menuItems = [
     label: "About",
     icon: <IdcardOutlined />,
     items: [
-      { key: "about-who", label: "Who Are We", link: "/about/who-are-you" },
+      { key: "about-who", label: "Who Are We", link: "/about/who-are-we" },
       { key: "about-news", label: "News", link: "/about/news" },
       {
         key: "open-position",
@@ -126,10 +126,9 @@ const menuItems = [
 
 const Sidebar = (props: Props) => {
   const { isNavCollapsed } = useAppSelector((state) => state.sidebar);
-  const [activeSidebar, setIsActiveSidebar] = useState("");
+  const [activeTopKey, setActiveTopKey] = useState("/");
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const pathname = usePathname();
-  console.log("pathname", pathname);
 
   // Render menu items recursively
   const renderMenuItems = (items: any) =>
@@ -164,9 +163,22 @@ const Sidebar = (props: Props) => {
     }
   };
 
+  useEffect(() => {
+    // Determine active top-level menu item
+    const getActiveTopKey = menuItems.find((item) => {
+      if (pathname === "/") {
+        return pathname === item.link;
+      } else {
+        return pathname.split("/")[1] === item.key;
+      }
+    })?.key;
+
+    setActiveTopKey(getActiveTopKey as string);
+  }, [pathname]);
+
   return (
     <div
-      className={`bg-white absolute top-[80px] md:top-0 left-0 h-[calc(100dvh-80px)] md:h-[calc(100dvh-80px)] transition-all duration-500 ease-in-out z-20
+      className={`bg-white dark:bg-[#1e293b] absolute top-[80px] md:top-0 left-0 h-[calc(100dvh-80px)] md:h-[calc(100dvh-80px)] transition-all duration-500 ease-in-out z-20
         ${
           isNavCollapsed
             ? "-translate-x-full md:w-[70px] md:translate-x-0"
@@ -174,7 +186,7 @@ const Sidebar = (props: Props) => {
         }
         md:relative md:translate-x-0 w-[200px] text-black flex flex-col`}
     >
-      <div className="flex-1 flex flex-col my-4 overflow-x-hidden overflow-y-auto shadow-shadow-1">
+      <div className="flex-1 flex flex-col my-4 overflow-x-hidden overflow-y-auto">
         <ConfigProvider
           theme={{
             components: {
@@ -195,10 +207,11 @@ const Sidebar = (props: Props) => {
             mode="inline"
             theme="light"
             inlineCollapsed={isNavCollapsed}
-            className="text-base"
+            className="text-base !bg-white dark:!bg-[#1e293b]"
             items={renderMenuItems(menuItems)}
             openKeys={openKeys}
             onOpenChange={handleOpenChange}
+            selectedKeys={activeTopKey ? [activeTopKey] : []}
           />
         </ConfigProvider>
       </div>
