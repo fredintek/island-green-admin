@@ -128,6 +128,7 @@ const Sidebar = (props: Props) => {
   const { isNavCollapsed } = useAppSelector((state) => state.sidebar);
   const [activeTopKey, setActiveTopKey] = useState("/");
   const [openKeys, setOpenKeys] = useState<string[]>([]);
+  const [activeSubKey, setActiveSubKey] = useState<string | null>(null);
   const pathname = usePathname();
 
   // Render menu items recursively
@@ -164,16 +165,20 @@ const Sidebar = (props: Props) => {
   };
 
   useEffect(() => {
-    // Determine active top-level menu item
-    const getActiveTopKey = menuItems.find((item) => {
-      if (pathname === "/") {
-        return pathname === item.link;
-      } else {
-        return pathname.split("/")[1] === item.key;
-      }
-    })?.key;
+    // Find active top-level menu item
+    const activeMenuItem = menuItems.find((item) => {
+      if (item.link) return pathname === item.link;
+      return item.items?.some((subItem) => pathname === subItem.link);
+    });
 
-    setActiveTopKey(getActiveTopKey as string);
+    // Extract submenu key if applicable
+    const activeSubItem = activeMenuItem?.items?.find(
+      (subItem) => subItem.link === pathname
+    );
+
+    setActiveTopKey(activeMenuItem?.key || "");
+    setActiveSubKey(activeSubItem?.key || null);
+    setOpenKeys(activeSubItem ? [activeMenuItem?.key as string] : []);
   }, [pathname]);
 
   return (
@@ -211,7 +216,7 @@ const Sidebar = (props: Props) => {
             items={renderMenuItems(menuItems)}
             openKeys={openKeys}
             onOpenChange={handleOpenChange}
-            selectedKeys={activeTopKey ? [activeTopKey] : []}
+            selectedKeys={activeSubKey ? [activeSubKey] : [activeTopKey]}
           />
         </ConfigProvider>
       </div>

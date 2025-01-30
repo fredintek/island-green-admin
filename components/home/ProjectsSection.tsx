@@ -13,13 +13,10 @@ import {
 import {
   DeleteOutlined,
   EditOutlined,
-  InboxOutlined,
   PlusOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
 import dynamic from "next/dynamic";
-
-import "react-quill-new/dist/quill.snow.css";
 
 const { Dragger } = Upload;
 
@@ -293,7 +290,7 @@ const ProjectsSection = (props: Props) => {
             >
               <button
                 type="button"
-                className="p-1 rounded-md text-white cursor-pointer flex gap-2 items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade dark:text-primaryShade transition-colors duration-300"
+                className="p-1 rounded-md text-white cursor-pointer flex gap-2 items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
               >
                 <UploadOutlined className="text-lg" />
                 <p className="uppercase font-medium text-sm">Upload</p>
@@ -303,7 +300,7 @@ const ProjectsSection = (props: Props) => {
             <button
               onClick={() => form.submit()}
               type="button"
-              className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade dark:text-primaryShade transition-colors duration-300"
+              className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
             >
               <p className="uppercase font-medium">
                 {editingProject ? "Update Project" : "Add Project"}

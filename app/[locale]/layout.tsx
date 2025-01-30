@@ -4,6 +4,7 @@ config.autoAddCss = false;
 import type { Metadata } from "next";
 import "./globals.css";
 import "./icomoon.css";
+import "react-quill-new/dist/quill.snow.css";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getMessages } from "next-intl/server";

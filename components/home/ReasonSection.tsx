@@ -256,7 +256,7 @@ const ReasonSection = (props: Props) => {
           <button
             onClick={() => form.submit()}
             type="button"
-            className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade border border-secondaryShade hover:bg-transparent hover:text-secondaryShade dark:text-primaryShade transition-colors duration-300"
+            className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
           >
             <p className="uppercase font-medium">save</p>
           </button>
