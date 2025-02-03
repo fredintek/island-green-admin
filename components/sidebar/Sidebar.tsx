@@ -30,11 +30,11 @@ const menuItems = [
     items: [
       { key: "about-who", label: "Who Are We", link: "/about/who-are-we" },
       { key: "about-news", label: "News", link: "/about/news" },
-      {
-        key: "open-position",
-        label: "Position",
-        link: "/about/open-positions",
-      },
+      // {
+      //   key: "open-position",
+      //   label: "Position",
+      //   link: "/about/open-positions",
+      // },
     ],
   },
   {

@@ -46,82 +46,24 @@ const ProjectHouses = (props: Props) => {
     []
   );
 
-  const displayDraggerProps: UploadProps = {
+  const generateUploadProps = (
+    maxCount: number | undefined,
+    multiple: boolean,
+    existingFiles: any[]
+  ): UploadProps => ({
     name: "file",
-    multiple: false,
-    beforeUpload(file) {
-      console.log("File selected:", file);
-      return false;
-    },
-    onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-        console.log("INFO FILE:uploading", info.file, info.fileList);
-      }
-      if (status === "done") {
-        console.log("INFO FILE:done", info.file);
-      } else if (status === "error") {
-        console.log("INFO FILE:error", info.file);
-      }
-    },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
-    listType: "picture-card",
-    maxCount: 1,
-    accept: "image/*",
-  };
-
-  const coverDraggerProps: UploadProps = {
-    name: "file",
-    multiple: false,
-    beforeUpload(file) {
-      console.log("File selected:", file);
-      return false;
-    },
-    onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-        console.log("INFO FILE:uploading", info.file, info.fileList);
-      }
-      if (status === "done") {
-        console.log("INFO FILE:done", info.file);
-      } else if (status === "error") {
-        console.log("INFO FILE:error", info.file);
-      }
-    },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
-    listType: "picture-card",
-    maxCount: 1,
-    accept: "image/*",
-  };
-
-  const galleryDraggerProps: UploadProps = {
-    name: "file",
-    multiple: true,
-    beforeUpload(file) {
-      console.log("File selected:", file);
-      return false;
-    },
-    onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-        console.log("INFO FILE:uploading", info.file, info.fileList);
-      }
-      if (status === "done") {
-        console.log("INFO FILE:done", info.file);
-      } else if (status === "error") {
-        console.log("INFO FILE:error", info.file);
-      }
-    },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
+    multiple,
+    beforeUpload: () => false,
     listType: "picture-card",
     accept: "image/*",
-  };
+    maxCount,
+    fileList: existingFiles.map((url, index) => ({
+      uid: String(index),
+      name: `image-${index}.png`,
+      status: "done",
+      url,
+    })),
+  });
 
   const handleFormSubmit = (values: any) => {
     console.log("values", values);
@@ -418,7 +360,7 @@ const ProjectHouses = (props: Props) => {
                         alt="default-image"
                         className="w-full h-full object-cover"
                       />
-                      <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" />
+                      {/* <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" /> */}
                     </div>
                   ))}
                 </div>
@@ -441,7 +383,7 @@ const ProjectHouses = (props: Props) => {
                         alt="default-image"
                         className="w-full h-full object-cover"
                       />
-                      <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" />
+                      {/* <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" /> */}
                     </div>
                   ))}
                 </div>
@@ -456,7 +398,7 @@ const ProjectHouses = (props: Props) => {
                 Upload New Display image
               </p>
               <div className="border-2 border-secondaryShade dark:border-primaryShade border-dashed rounded-xl w-full">
-                <Dragger {...displayDraggerProps} className="">
+                <Dragger {...generateUploadProps(1, false, [])} className="">
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined className="!text-secondaryShade dark:!text-primaryShade" />
                   </p>
@@ -473,7 +415,7 @@ const ProjectHouses = (props: Props) => {
                 Upload New cover image
               </p>
               <div className="border-2 border-secondaryShade dark:border-primaryShade border-dashed rounded-xl w-full">
-                <Dragger {...coverDraggerProps} className="">
+                <Dragger {...generateUploadProps(1, false, [])} className="">
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined className="!text-secondaryShade dark:!text-primaryShade" />
                   </p>
@@ -505,7 +447,9 @@ const ProjectHouses = (props: Props) => {
                       alt="default-image"
                       className="w-full h-full object-cover"
                     />
-                    <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" />
+                    {defaultImages3?.length > 1 ? (
+                      <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" />
+                    ) : null}
                   </div>
                 ))}
               </div>
@@ -518,7 +462,10 @@ const ProjectHouses = (props: Props) => {
               Upload New gallery images
             </p>
             <div className="border-2 border-secondaryShade dark:border-primaryShade border-dashed rounded-xl w-full">
-              <Dragger {...galleryDraggerProps} className="">
+              <Dragger
+                {...generateUploadProps(undefined, true, [])}
+                className=""
+              >
                 <p className="ant-upload-drag-icon">
                   <InboxOutlined className="!text-secondaryShade dark:!text-primaryShade" />
                 </p>

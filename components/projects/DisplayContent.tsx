@@ -7,6 +7,10 @@ const { Dragger } = Upload;
 
 type Props = {};
 
+const defaultImages1 = [
+  "https://images.unsplash.com/photo-1736779580644-6b4268af4642?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw3fHx8ZW58MHx8fHx8",
+];
+
 const DisplayContent = (props: Props) => {
   const [form] = Form.useForm();
   // Dynamically load the ReactQuill component (to prevent SSR issues)
@@ -71,18 +75,42 @@ const DisplayContent = (props: Props) => {
 
       {/* content */}
       <div>
-        <p className="text-lg text-black dark:text-gray-300 font-medium capitalize mb-2">
-          Upload Image
-        </p>
-        <div className="border-2 border-secondaryShade dark:border-primaryShade border-dashed rounded-xl w-full">
-          <Dragger {...draggerProps} className="">
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined className="!text-secondaryShade dark:!text-primaryShade" />
-            </p>
-            <p className="ant-upload-text !text-black dark:!text-gray-300">
-              Click or drag file to this area to upload
-            </p>
-          </Dragger>
+        <div className="flex flex-col gap-3">
+          {(defaultImages1?.length as number) > 0 && (
+            <div>
+              <p className="text-lg text-black dark:text-gray-300 font-medium capitalize mb-2">
+                Existing Display Content Image
+              </p>
+              <div className="grid grid-cols-fluid gap-4">
+                {defaultImages1?.map((image) => (
+                  <div
+                    key={image}
+                    className="relative max-w-[300px] w-full aspect-square rounded-md overflow-hidden"
+                  >
+                    <img
+                      src={image}
+                      alt="default-image"
+                      className="w-full h-full object-cover"
+                    />
+                    {/* <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" /> */}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <p className="text-lg text-black dark:text-gray-300 font-medium capitalize">
+            Upload Image
+          </p>
+          <div className="border-2 border-secondaryShade dark:border-primaryShade border-dashed rounded-xl w-full">
+            <Dragger {...draggerProps} className="">
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined className="!text-secondaryShade dark:!text-primaryShade" />
+              </p>
+              <p className="ant-upload-text !text-black dark:!text-gray-300">
+                Click or drag file to this area to upload
+              </p>
+            </Dragger>
+          </div>
         </div>
       </div>
 
