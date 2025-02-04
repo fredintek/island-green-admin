@@ -5,13 +5,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./icomoon.css";
 import "react-quill-new/dist/quill.snow.css";
+import ReduxProvider from "@/redux/ReduxProvider";
+import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getMessages } from "next-intl/server";
-import { NextIntlClientProvider } from "next-intl";
-import ReduxProvider from "@/redux/ReduxProvider";
-import Navbar from "@/components/navbar/Navbar";
-import Sidebar from "@/components/sidebar/Sidebar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -35,24 +33,13 @@ export default async function RootLayout({
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
-
   return (
     <html lang={locale}>
       <body
         className={`antialiased flex flex-col min-h-[100dvh] bg-gray-200 dark:bg-[#475569] overflow-hidden`}
       >
         <NextIntlClientProvider messages={messages}>
-          <ReduxProvider>
-            <Navbar />
-            <div className="flex-1 flex h-[calc(100dvh-80px)] mt-[80px]">
-              {/* sidebar */}
-              <Sidebar />
-              {/* content */}
-              <main className="flex-1 m-4 h-[calc(100dvh-80px-32px)] bg-gray-200 dark:bg-[#475569] p-4 overflow-y-auto">
-                {children}
-              </main>
-            </div>
-          </ReduxProvider>
+          <ReduxProvider>{children}</ReduxProvider>
         </NextIntlClientProvider>
       </body>
     </html>

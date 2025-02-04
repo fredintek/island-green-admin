@@ -45,17 +45,17 @@ const menuItems = [
       {
         key: "projects-green-and-blue",
         label: "Green And Blue",
-        link: "/projects/green-and-blue",
+        link: "/dashboard/projects/green-and-blue",
       },
       {
         key: "projects-yalusa-homes",
         label: "Yalusa Homes",
-        link: "/projects/yalusa-homes",
+        link: "/dashboard/projects/yalusa-homes",
       },
       {
         key: "projects-aquamarine",
         label: "Aquamarine Bosphorus Mansion",
-        link: "/projects/aquamarine",
+        link: "/dashboard/projects/aquamarine",
       },
     ],
   },
@@ -67,17 +67,17 @@ const menuItems = [
       {
         key: "360-green-and-blue",
         label: "Green And Blue",
-        link: "/360/green-and-blue",
+        link: "/dashboard/360/green-and-blue",
       },
       {
         key: "360-yalusa-homes",
         label: "Yalusa Homes",
-        link: "/360/yalusa-homes",
+        link: "/dashboard/360/yalusa-homes",
       },
       {
         key: "360-aquamarine",
         label: "Aquamarine Bosphorus Mansion",
-        link: "/360/aquamarine",
+        link: "/dashboard/360/aquamarine",
       },
     ],
   },
@@ -89,24 +89,24 @@ const menuItems = [
       {
         key: "north-cyprus-about",
         label: "About Northern Cyprus",
-        link: "/blog/north-cyprus-about",
+        link: "/dashboard/blog/north-cyprus-about",
       },
       {
         key: "secret-paradise",
         label: "The Hidden Paradise of Northern Cyprus:Karpaz Peninsula",
-        link: "/blog/secret-paradise",
+        link: "/dashboard/blog/secret-paradise",
       },
       {
         key: "buying-guide",
         label:
           "Real Estate Buying Guide in Northern Cyprus:Investment and Living Opportunities",
-        link: "/blog/buying-guide",
+        link: "/dashboard/blog/buying-guide",
       },
       {
         key: "investment-opportunities",
         label:
           "Investment Opportunities in Northern Cyprus:The Shining Future of the Sunny Island",
-        link: "/blog/investment-opportunities",
+        link: "/dashboard/blog/investment-opportunities",
       },
     ],
   },
@@ -114,13 +114,13 @@ const menuItems = [
     key: "faq",
     label: "FAQ",
     icon: <QuestionOutlined />,
-    link: "/faq",
+    link: "/dashboard/faq",
   },
   {
     key: "communication",
     label: "Communication",
     icon: <PhoneOutlined className="rotate-180" />,
-    link: "/communication",
+    link: "/dashboard/communication",
   },
 ];
 
