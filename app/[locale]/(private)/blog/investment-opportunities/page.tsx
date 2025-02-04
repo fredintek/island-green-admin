@@ -1,12 +1,15 @@
+import BlogContent from "@/components/blog/BlogContent";
+import BlogImages from "@/components/blog/BlogImages";
 import React from "react";
 
 type Props = {};
 
 const page = (props: Props) => {
   return (
-    <div>
-      <p>investment-opportunities</p>
-    </div>
+    <section className="flex flex-col gap-10">
+      <BlogContent />
+      <BlogImages />
+    </section>
   );
 };
 
