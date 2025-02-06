@@ -21,15 +21,19 @@ const menuItems = [
     key: "home",
     label: "Home",
     icon: <HomeOutlined />,
-    link: "/",
+    link: "/dashboard",
   },
   {
     key: "about",
     label: "About",
     icon: <IdcardOutlined />,
     items: [
-      { key: "about-who", label: "Who Are We", link: "/about/who-are-we" },
-      { key: "about-news", label: "News", link: "/about/news" },
+      {
+        key: "about-who",
+        label: "Who Are We",
+        link: "/dashboard/about/who-are-we",
+      },
+      { key: "about-news", label: "News", link: "/dashboard/about/news" },
       // {
       //   key: "open-position",
       //   label: "Position",

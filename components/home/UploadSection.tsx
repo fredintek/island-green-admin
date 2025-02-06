@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Upload, UploadProps, message } from "antd";
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 
@@ -16,28 +16,26 @@ const defaultImages = [
 ];
 
 const UploadSection = (props: Props) => {
+  const [heroFileList, setHeroFileList] = useState<any>([]);
+
   const draggerProps: UploadProps = {
     name: "file",
     multiple: true,
     beforeUpload(file) {
-      console.log("File selected:", file);
       return false;
     },
     onChange(info) {
       const { status } = info.file;
       if (status !== "uploading") {
-        console.log("INFO FILE:uploading", info.file, info.fileList);
+        // console.log("INFO FILE:uploading", info.file, info.fileList);
+        setHeroFileList(info.fileList);
       }
-      if (status === "done") {
-        console.log("INFO FILE:done", info.file);
-      } else if (status === "error") {
-        console.log("INFO FILE:error", info.file);
-      }
-    },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
     },
     listType: "picture-card",
+  };
+
+  const handleSubmit = () => {
+    console.log(heroFileList);
   };
 
   return (
@@ -63,7 +61,9 @@ const UploadSection = (props: Props) => {
                     alt="default-image"
                     className="w-full h-full object-cover"
                   />
-                  <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" />
+                  {defaultImages?.length > 1 && (
+                    <DeleteOutlined className="text-red-500 text-lg absolute top-2 right-2 cursor-pointer" />
+                  )}
                 </div>
               ))}
             </div>
@@ -93,6 +93,7 @@ const UploadSection = (props: Props) => {
 
         {/* Submit Button */}
         <button
+          onClick={handleSubmit}
           type="button"
           className="ml-auto px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
         >
