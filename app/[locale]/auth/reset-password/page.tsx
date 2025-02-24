@@ -1,7 +1,8 @@
 "use client";
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Form } from "antd";
+import { Button, Form, Input } from "antd";
 import FormItem from "antd/es/form/FormItem";
+import OTP from "antd/es/input/OTP";
 import Password from "antd/es/input/Password";
 import React from "react";
 
@@ -40,61 +41,102 @@ const page = (props: Props) => {
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        className="mt-4 flex flex-col gap-4"
+        className="mt-4 flex flex-col gap-1"
         requiredMark={customizeRequiredMark}
       >
-        <div className="">
-          <FormItem
-            label="Password"
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: "Please input your password!",
+        <FormItem
+          label="Email"
+          name="email"
+          rules={[
+            {
+              required: true,
+              message: "Please input your email!",
+            },
+            {
+              type: "email",
+              message: "The input is not a valid email!",
+            },
+          ]}
+        >
+          <Input
+            className="bg-gray-200"
+            placeholder="Email Address"
+            size="large"
+          />
+        </FormItem>
+
+        {/* OTP */}
+        <FormItem
+          label="Otp"
+          name="otp"
+          rules={[
+            {
+              required: true,
+              message: "Otp token is required!",
+            },
+          ]}
+        >
+          <OTP
+            length={6}
+            size="large"
+            status={""}
+            onChange={(value) => {
+              console.log("onChange", value);
+            }}
+            type="text"
+          />
+        </FormItem>
+
+        <FormItem
+          label="Password"
+          name="password"
+          rules={[
+            {
+              required: true,
+              message: "Please input your password!",
+            },
+            {
+              pattern:
+                /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+              message:
+                "Password must contain minimum eight characters, at least one letter, one number and one special character",
+            },
+          ]}
+        >
+          <Password
+            className="bg-gray-200"
+            placeholder="Password"
+            size="large"
+          />
+        </FormItem>
+
+        <FormItem
+          label="Confirm Password"
+          name="confirmPassword"
+          rules={[
+            {
+              required: true,
+              message: "Please input your confirm Password!",
+            },
+            {
+              validator: (_, value) => {
+                if (!value || value === form.getFieldValue("password")) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(
+                  new Error("The two passwords do not match!")
+                );
               },
-              {
-                pattern:
-                  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                message:
-                  "Password must contain minimum eight characters, at least one letter, one number and one special character",
-              },
-            ]}
-          >
-            <Password
-              className="bg-gray-200"
-              placeholder="Password"
-              size="large"
-            />
-          </FormItem>
-        </div>
-        <div className="">
-          <FormItem
-            label="Confirm Password"
-            name="confirmPassword"
-            rules={[
-              {
-                required: true,
-                message: "Please input your confirm Password!",
-              },
-              {
-                validator: (_, value) => {
-                  if (!value || value === form.getFieldValue("password")) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(
-                    new Error("The two passwords do not match!")
-                  );
-                },
-              },
-            ]}
-          >
-            <Password
-              className="bg-gray-200"
-              placeholder="Password"
-              size="large"
-            />
-          </FormItem>
-        </div>
+            },
+          ]}
+        >
+          <Password
+            className="bg-gray-200"
+            placeholder="Password"
+            size="large"
+          />
+        </FormItem>
+
         <Button className="bg-black h-[39.6px] text-white py-[7px] px-[11px] rounded-[8px] flex justify-center items-center gap-2">
           <p className="font-medium">Reset Your Password</p>
         </Button>

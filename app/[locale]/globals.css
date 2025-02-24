@@ -122,6 +122,10 @@ body {
   top: 10px !important;
 }
 
+.ant-otp {
+  width: 100%;
+}
+
 .ant-modal.normal-modal {
   top: 100px !important;
 }
