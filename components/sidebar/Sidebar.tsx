@@ -5,14 +5,16 @@ import {
   FolderOutlined,
   HomeOutlined,
   IdcardOutlined,
+  LogoutOutlined,
   PhoneOutlined,
   QuestionOutlined,
   ReadOutlined,
   RotateLeftOutlined,
 } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
-import { ConfigProvider, Menu } from "antd";
+import { ConfigProvider, Menu, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
+import { useLogoutMutation } from "@/redux/api/authApiSlice";
 
 type Props = {};
 
@@ -134,6 +136,8 @@ const Sidebar = (props: Props) => {
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [activeSubKey, setActiveSubKey] = useState<string | null>(null);
   const pathname = usePathname();
+  const [logout, { isError, isLoading, isSuccess, error, data }] =
+    useLogoutMutation(undefined);
 
   // Render menu items recursively
   const renderMenuItems = (items: any) =>
@@ -195,7 +199,7 @@ const Sidebar = (props: Props) => {
         }
         md:relative md:translate-x-0 w-[200px] text-black flex flex-col`}
     >
-      <div className="flex-1 flex flex-col my-4 overflow-x-hidden overflow-y-auto">
+      <div className="border flex-1 flex flex-col my-4 overflow-x-hidden overflow-y-auto">
         <ConfigProvider
           theme={{
             components: {
@@ -224,6 +228,25 @@ const Sidebar = (props: Props) => {
           />
         </ConfigProvider>
       </div>
+
+      <Tooltip title="logout">
+        <button
+          type="button"
+          className="mx-auto mb-2 px-6 py-2 w-[95%] rounded-md text-white cursor-pointer flex items-center justify-center gap-2 bg-red-500 transition duration-300"
+          onClick={() => logout(undefined)}
+        >
+          <LogoutOutlined />
+          <p
+            className={`${
+              isNavCollapsed
+                ? "w-0 md:w-0 opacity-0 invisible"
+                : "visible opacity-100"
+            } uppercase font-medium transition-all duration-300`}
+          >
+            Logout
+          </p>
+        </button>
+      </Tooltip>
     </div>
   );
 };

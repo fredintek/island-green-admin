@@ -1,5 +1,6 @@
 "use client";
 import { Link } from "@/i18n/routing";
+import { useLoginMutation } from "@/redux/api/authApiSlice";
 import { LoginOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import FormItem from "antd/es/form/FormItem";
@@ -21,8 +22,11 @@ const customizeRequiredMark = (
 const page = (props: Props) => {
   const [form] = Form.useForm();
 
+  const [login, { isError, isLoading, isSuccess, data, error }] =
+    useLoginMutation();
+
   const handleSubmit = (values: any) => {
-    console.log("VALUES", values);
+    login({ email: values.email, password: values.password });
   };
   return (
     <div className="bg-white relative max-w-[500px] w-[90%] flex flex-col border rounded-lg shadow-shadow-2 bg-login-box p-3">
@@ -98,9 +102,9 @@ const page = (props: Props) => {
             Forgot Password?
           </Link>
         </div>
-        <Button className="bg-black h-[39.6px] text-white py-[7px] px-[11px] rounded-[8px] flex justify-center items-center gap-2">
+        <button className="bg-black h-[39.6px] text-white py-[7px] px-[11px] rounded-[8px] flex justify-center items-center gap-2">
           <p className="font-medium">Login</p>
-        </Button>
+        </button>
       </Form>
     </div>
   );

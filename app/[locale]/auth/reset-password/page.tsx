@@ -137,9 +137,9 @@ const page = (props: Props) => {
           />
         </FormItem>
 
-        <Button className="bg-black h-[39.6px] text-white py-[7px] px-[11px] rounded-[8px] flex justify-center items-center gap-2">
+        <button className="bg-black h-[39.6px] text-white py-[7px] px-[11px] rounded-[8px] flex justify-center items-center gap-2">
           <p className="font-medium">Reset Your Password</p>
-        </Button>
+        </button>
       </Form>
     </div>
   );

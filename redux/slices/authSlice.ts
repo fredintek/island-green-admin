@@ -1,5 +1,7 @@
 import { UserRole } from "@/constants/auth.constant";
 import { createSlice } from "@reduxjs/toolkit";
+import { authApiSlice } from "../api/authApiSlice";
+import { toast } from "react-toastify";
 
 type UserType = {
   id: number;
@@ -8,6 +10,12 @@ type UserType = {
   email: string | null;
   role: UserRole;
 };
+
+interface LoginErrorResponse {
+  message?: string;
+  error?: string;
+  statusCode?: number;
+}
 
 interface InitialStateType {
   token: string | null;
@@ -32,7 +40,40 @@ const authSlice = createSlice({
       state.user = {};
     },
   },
-  extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    builder
+      .addMatcher(
+        authApiSlice.endpoints.login.matchFulfilled,
+        (state, action) => {
+          state.token = action.payload.accessToken;
+          state.user = action.payload.user;
+          toast.success(action.payload.message);
+          window.location.reload();
+        }
+      )
+      .addMatcher(
+        authApiSlice.endpoints.login.matchRejected,
+        (state, action) => {
+          const errData = action.payload?.data as LoginErrorResponse;
+          toast.error(errData?.message);
+        }
+      )
+      .addMatcher(
+        authApiSlice.endpoints.logout.matchFulfilled,
+        (state, action) => {
+          state.user = {};
+          state.token = "";
+          window.location.reload();
+        }
+      )
+      .addMatcher(
+        authApiSlice.endpoints.logout.matchRejected,
+        (state, action) => {
+          const errData = action.payload?.data as LoginErrorResponse;
+          toast.error(errData?.message);
+        }
+      );
+  },
 });
 
 export const { setAccessToken, logoutUser } = authSlice.actions;
