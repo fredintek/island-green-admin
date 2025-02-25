@@ -1,8 +1,11 @@
 "use client";
+import { useRouter } from "@/i18n/routing";
+import { useForgotPasswordMutation } from "@/redux/api/authApiSlice";
 import { UnlockOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
+import { Form, Input } from "antd";
 import FormItem from "antd/es/form/FormItem";
-import React from "react";
+import React, { useEffect } from "react";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -18,19 +21,33 @@ const customizeRequiredMark = (
 
 const page = (props: Props) => {
   const [form] = Form.useForm();
+  const router = useRouter();
+
+  const [forgotPassword, { isError, isLoading, isSuccess, data, error }] =
+    useForgotPasswordMutation();
 
   const handleSubmit = (values: any) => {
-    console.log("VALUES", values);
+    forgotPassword({ email: values.email });
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      router.replace(`/auth/reset-password`);
+      toast.success(data.message);
+    }
+
+    if (isError) {
+      const customError = error as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [isSuccess, isError, error, data]);
   return (
     <div className="bg-white relative max-w-[500px] w-[90%] flex flex-col border rounded-lg shadow-shadow-2 bg-login-box p-3">
       <div className="p-3 rounded-lg grid place-items-center bg-white shadow-shadow-1 w-fit mx-auto mb-4">
         <UnlockOutlined className="text-2xl" />
       </div>
 
-      <p className="text-xl font-semibold text-center">
-        Request Password Change
-      </p>
+      <p className="text-xl font-semibold text-center">Forgot Password</p>
       <p className="text-sm font-normal text-[#666] text-center">
         Don’t worry, we’ve got you covered! Enter your email to receive
         instructions on how to reset your password and regain access to your

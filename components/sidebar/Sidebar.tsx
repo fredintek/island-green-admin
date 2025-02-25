@@ -199,7 +199,7 @@ const Sidebar = (props: Props) => {
         }
         md:relative md:translate-x-0 w-[200px] text-black flex flex-col`}
     >
-      <div className="border flex-1 flex flex-col my-4 overflow-x-hidden overflow-y-auto">
+      <div className="flex-1 flex flex-col my-4 overflow-x-hidden overflow-y-auto">
         <ConfigProvider
           theme={{
             components: {

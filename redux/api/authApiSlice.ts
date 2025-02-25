@@ -33,7 +33,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     forgotPassword: builder.mutation({
       query: ({ email }) => ({
         url: "/auth/forgot-password",
-        method: "POST",
+        method: "PATCH",
         body: { email },
       }),
     }),

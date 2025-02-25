@@ -1,10 +1,13 @@
 "use client";
+import { useRouter } from "@/i18n/routing";
+import { useResetPasswordMutation } from "@/redux/api/authApiSlice";
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
+import { Form, Input } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import OTP from "antd/es/input/OTP";
 import Password from "antd/es/input/Password";
-import React from "react";
+import React, { useEffect } from "react";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -21,9 +24,30 @@ const customizeRequiredMark = (
 const page = (props: Props) => {
   const [form] = Form.useForm();
 
+  const router = useRouter();
+
+  const [resetPassword, { isError, isLoading, isSuccess, data, error }] =
+    useResetPasswordMutation();
+
   const handleSubmit = (values: any) => {
-    console.log("VALUES", values);
+    resetPassword({
+      email: values.email,
+      token: values.otp,
+      password: values.password,
+    });
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      router.replace(`/auth/login`);
+      toast.success(data.message);
+    }
+
+    if (isError) {
+      const customError = error as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [isSuccess, isError, error, data]);
   return (
     <div className="bg-white relative max-w-[500px] w-[90%] flex flex-col border rounded-lg shadow-shadow-2 bg-login-box p-3">
       <div className="p-3 rounded-lg grid place-items-center bg-white shadow-shadow-1 w-fit mx-auto mb-4">
@@ -76,15 +100,7 @@ const page = (props: Props) => {
             },
           ]}
         >
-          <OTP
-            length={6}
-            size="large"
-            status={""}
-            onChange={(value) => {
-              console.log("onChange", value);
-            }}
-            type="text"
-          />
+          <OTP length={6} size="large" status={""} type="text" />
         </FormItem>
 
         <FormItem
