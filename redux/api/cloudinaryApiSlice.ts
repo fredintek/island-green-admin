@@ -5,10 +5,10 @@ export const cloudinaryApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // delete image
     deleteFileFromCloudinary: builder.mutation({
-      query: (publicId) => ({
+      query: (body) => ({
         url: `/cloudinary/remove-file`,
         method: "DELETE",
-        body: { publicId },
+        body,
       }),
     }),
   }),

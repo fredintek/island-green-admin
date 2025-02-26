@@ -3,10 +3,21 @@ import { apiSlice } from "./apiSlice";
 export const sectionApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
-    // Get Section by ID
+    // Get Section by page ID
     getSectionByPageId: builder.query({
       query: (id) => `/section/page/${id}`,
     }),
+
+    // Get Section By Page Name
+    getSectionByPageName: builder.query({
+      query: (slug) => `/section/page/name/${slug}`,
+    }),
+
+    // Get Section By Page Name
+    getSectionByType: builder.query({
+      query: (type) => `/section/type/${type}`,
+    }),
+
     // Update Section
     updateSection: builder.mutation({
       query: (body) => ({
@@ -46,4 +57,6 @@ export const {
   useCreateSectionMutation,
   useGetSectionQuery,
   useRemoveLinkFromSectionContentMutation,
+  useGetSectionByPageNameQuery,
+  useGetSectionByTypeQuery,
 } = sectionApiSlice;

@@ -2,6 +2,7 @@
 import { Link, usePathname } from "@/i18n/routing";
 import { useAppSelector } from "@/redux/store";
 import {
+  FileOutlined,
   FolderOutlined,
   HomeOutlined,
   IdcardOutlined,
@@ -11,12 +12,43 @@ import {
   ReadOutlined,
   RotateLeftOutlined,
 } from "@ant-design/icons";
-import { v4 as uuidv4 } from "uuid";
 import { ConfigProvider, Menu, Tooltip } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { useLogoutMutation } from "@/redux/api/authApiSlice";
+import { useGetAllPagesQuery } from "@/redux/api/pageApiSlice";
+import { Page } from "@/utils/interfaces";
+import { useLocale } from "next-intl";
 
 type Props = {};
+
+const getIcon = (slug: string): JSX.Element => {
+  switch (slug) {
+    case "home":
+      return <HomeOutlined />;
+    case "about":
+      return <IdcardOutlined />;
+    case "projects":
+      return <FolderOutlined />;
+    case "360":
+      return <RotateLeftOutlined />;
+    case "blog":
+      return <ReadOutlined />;
+    case "faq":
+      return <QuestionOutlined />;
+    case "communication":
+      return <PhoneOutlined className="rotate-180" />;
+    default:
+      return <HomeOutlined />;
+  }
+};
+
+type MenuItem = {
+  key: string;
+  label: string;
+  icon?: JSX.Element;
+  link?: string;
+  items?: MenuItem[];
+};
 
 const menuItems = [
   {
@@ -36,11 +68,6 @@ const menuItems = [
         link: "/dashboard/about/who-are-we",
       },
       { key: "about-news", label: "News", link: "/dashboard/about/news" },
-      // {
-      //   key: "open-position",
-      //   label: "Position",
-      //   link: "/about/open-positions",
-      // },
     ],
   },
   {
@@ -136,8 +163,52 @@ const Sidebar = (props: Props) => {
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [activeSubKey, setActiveSubKey] = useState<string | null>(null);
   const pathname = usePathname();
-  const [logout, { isError, isLoading, isSuccess, error, data }] =
-    useLogoutMutation(undefined);
+  const locale = useLocale() as "en" | "ru" | "tr";
+  const [
+    logoutFn,
+    {
+      isError: logoutIsError,
+      isLoading: logoutIsLoading,
+      isSuccess: logoutIsSuccess,
+      error: logoutError,
+      data: logoutData,
+    },
+  ] = useLogoutMutation(undefined);
+
+  const {
+    data: getAllPagesData,
+    isError: getAllPagesIsError,
+    isLoading: getAllPagesIsLoading,
+    isSuccess: getAllPagesIsSuccess,
+    error: getAllPagesError,
+  } = useGetAllPagesQuery(undefined);
+
+  // console.log("getAllPagesData -->", getAllPagesData);
+  // console.log("activeSubKey", activeSubKey);
+  // console.log("activeTopKey", activeTopKey);
+
+  const mapPagesToMenuItems = (pages: Page[]): MenuItem[] => {
+    return pages.map((page) => {
+      const menuItem: MenuItem = {
+        key: page.slug,
+        label: page.title[locale], // Assuming English as the default label
+        icon: getIcon(page.slug),
+      };
+
+      // If the page has subPages, we process them into nested items
+      if (page.subPages.length > 0) {
+        menuItem.items = page.subPages.map((subPage) => ({
+          key: subPage.slug,
+          label: subPage.title[locale], // Assuming English as the default label
+          link: `/dashboard/${page.slug}/${subPage.slug}`,
+        }));
+      } else {
+        menuItem.link = `/dashboard/${page.slug}`;
+      }
+
+      return menuItem;
+    });
+  };
 
   // Render menu items recursively
   const renderMenuItems = (items: any) =>
@@ -174,7 +245,7 @@ const Sidebar = (props: Props) => {
 
   useEffect(() => {
     // Find active top-level menu item
-    const activeMenuItem = menuItems.find((item) => {
+    const activeMenuItem = mapPagesToMenuItems(getAllPagesData).find((item) => {
       if (item.link) return pathname === item.link;
       return item.items?.some((subItem) => pathname === subItem.link);
     });
@@ -221,7 +292,7 @@ const Sidebar = (props: Props) => {
             theme="light"
             inlineCollapsed={isNavCollapsed}
             className="text-base !bg-white dark:!bg-[#1e293b]"
-            items={renderMenuItems(menuItems)}
+            items={renderMenuItems(mapPagesToMenuItems(getAllPagesData))}
             openKeys={openKeys}
             onOpenChange={handleOpenChange}
             selectedKeys={activeSubKey ? [activeSubKey] : [activeTopKey]}
@@ -233,7 +304,7 @@ const Sidebar = (props: Props) => {
         <button
           type="button"
           className="mx-auto mb-2 px-6 py-2 w-[95%] rounded-md text-white cursor-pointer flex items-center justify-center gap-2 bg-red-500 transition duration-300"
-          onClick={() => logout(undefined)}
+          onClick={() => logoutFn(undefined)}
         >
           <LogoutOutlined />
           <p

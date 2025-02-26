@@ -8,6 +8,7 @@ import {
 import { RootState } from "../store";
 import { toast } from "react-toastify";
 import { logoutUser, setAccessToken } from "../slices/authSlice";
+import { authApiSlice } from "./authApiSlice";
 
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
@@ -31,11 +32,11 @@ const baseQueryWithReauth: BaseQueryFn<
 
   // Make the initial API request
   let result = await baseQuery(args, api, extraOptions);
-  // console.log("RESULT", result);
 
-  // If forbidden (403), attempt to refresh the token
-  if (result.error && result.error.status === 403) {
-    console.warn("Access token expired, attempting refresh...");
+  // If forbidden (401), attempt to refresh the token
+  if (result.error && result.error.status === 401) {
+    // console.log("RESULT", result);
+    // console.warn("Access token expired, attempting refresh...");
 
     // Attempt to refresh the token
     const refreshResult = await baseQuery(
@@ -46,25 +47,35 @@ const baseQueryWithReauth: BaseQueryFn<
 
     // console.log("refreshResult", refreshResult);
 
+    if (refreshResult.error) {
+      const refreshResultError = refreshResult.error as {
+        data: { message: string };
+        status: number;
+      };
+      // Call the logout mutation
+      await api
+        .dispatch(authApiSlice.endpoints.logout.initiate(undefined))
+        .unwrap();
+
+      // Clear user state
+      api.dispatch(logoutUser(undefined));
+
+      toast.error(refreshResultError.data.message);
+    }
+
     if (refreshResult.data) {
       const newAccessToken = (
         refreshResult.data as {
-          status: string;
           message: string;
-          data: { token: string };
+          accessToken: string;
         }
-      ).data.token;
+      ).accessToken;
 
       // Store the new access token in Redux
       api.dispatch(setAccessToken(newAccessToken));
 
       // Retry the original request with the new access token
       result = await baseQuery(args, api, extraOptions);
-    } else {
-      // Refresh token failed, log out the user
-      console.warn("Failed to refresh token. Logging out...");
-      api.dispatch(logoutUser(undefined));
-      toast.error("Login session expired");
     }
   }
 

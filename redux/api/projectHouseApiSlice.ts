@@ -5,7 +5,7 @@ export const projectHouseApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Get All Project House
     getAllProjectHouse: builder.query({
-      query: ({ isHomePage }) => {
+      query: (isHomePage) => {
         const queryParams =
           isHomePage !== undefined ? `?isHomePage=${isHomePage}` : "";
         return `/project-house/${queryParams}`;

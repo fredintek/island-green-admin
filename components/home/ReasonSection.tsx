@@ -1,136 +1,135 @@
 "use client";
+import { iconClasses } from "@/constants/icon-classes.constant";
+import {
+  useCreateSectionMutation,
+  useGetSectionByTypeQuery,
+} from "@/redux/api/sectionApiSlice";
+import { MultiLanguage } from "@/utils/interfaces";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Form, Input, Modal, Popconfirm, Select, Table, Tooltip } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import React, { useState } from "react";
+import { ColumnsType } from "antd/es/table";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 type Props = {};
 
-const iconClasses = [
-  "icon-pin",
-  "icon-email",
-  "icon-telephone",
-  "icon-data",
-  "icon-magnifying-glass",
-  "icon-construction-worker",
-  "icon-roof",
-  "icon-joist",
-  "icon-roof-1",
-  "icon-roof-2",
-  "icon-shield",
-  "icon-mission",
-  "icon-tick",
-  "icon-phone-call",
-  "icon-location",
-  "icon-message",
-  "icon-approved",
-  "icon-labour-day",
-  "icon-asbestos",
-  "icon-tick-1",
-  "icon-award",
-  "icon-roof-3",
-  "icon-construction-worker-1",
-  "icon-support",
-  "icon-analysis",
-  "icon-asbestos-1",
-  "icon-roof-4",
-  "icon-right-arrow",
-  "icon-left-arrow",
-  "icon-top-arrow",
-  "icon-bottom-arrow",
-  "icon-roof-5",
-  "icon-confirmation",
-  "icon-online-registration",
-];
+type Reason = {
+  title: MultiLanguage;
+  text: MultiLanguage;
+  icon: string;
+};
 
 const ReasonSection = (props: Props) => {
   const [form] = Form.useForm();
   const [openModal, setOpenModal] = useState(false);
-  const [editingReason, setEditingReason] = useState(null);
-  const [reasonData, setReasonData] = useState<any>([
+  const [editingReason, setEditingReason] = useState<Reason | null>(null);
+  const [reasonIndex, setReasonIndex] = useState<number | null>(null);
+
+  const {
+    data: getSectionData,
+    isLoading: getSectionIsLoading,
+    isError: getSectionIsError,
+    error: getSectionError,
+    refetch: getSectionRefetch,
+  } = useGetSectionByTypeQuery("reason", {
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
+  });
+
+  const [
+    createSectionFn,
     {
-      titleTr: "Kaliteli Ürün",
-      titleEn: "Quality Product",
-      titleRu: "Качественный продукт",
-      contentTr:
-        "Her zaman en kaliteli ürünleri ve en son teknoloji malzemeleri kullanarak üretim yapıyoruz.",
-      contentEn:
-        "We always produce using the highest quality products and state-of-the-art materials.",
-      contentRu:
-        "Мы всегда производим продукцию, используя самые качественные материалы и передовые технологии.",
-      icon: "icon-roof-2",
+      isError: createSectionIsError,
+      isLoading: createSectionIsLoading,
+      isSuccess: createSectionIsSuccess,
+      error: createSectionError,
+      data: createSectionData,
     },
-    {
-      titleTr: "Mükemmel Konum",
-      titleEn: "Perfect Location",
-      titleRu: "Идеальное расположение",
-      contentTr: "Her zaman en özel ve eşsiz lokasyonlarda yer alıyoruz.",
-      contentEn: "We are always in the most special and unique locations.",
-      contentRu: "Мы всегда находимся в самых особенных и уникальных местах.",
-      icon: "icon-mission",
-    },
-    {
-      titleTr: "Memnuniyet Garantisi",
-      titleEn: "Satisfaction Guarantee",
-      titleRu: "Гарантия удовлетворенности",
-      contentTr:
-        "Amacımız sadece satış yapmak değil, müşterilerimizi ailemizin bir parçası haline getirerek sürdürülebilir bir ilişki kurmaktır. Bu nedenle, memnuniyet önceliğimizdir.",
-      contentEn:
-        "Our goal is not just to make sales but to establish a sustainable relationship by making our customers part of our family. Therefore, satisfaction is our priority.",
-      contentRu:
-        "Наша цель — не просто продажи, а установление устойчивых отношений, делая наших клиентов частью нашей семьи. Поэтому удовлетворенность клиентов является нашим приоритетом.",
-      icon: "icon-shield",
-    },
-    {
-      titleTr: "Uzman Ekip",
-      titleEn: "Expert Team",
-      titleRu: "Экспертная команда",
-      contentTr:
-        "Deneyimli, eğitimli ve müşteri memnuniyetine önem veren bir ekip.",
-      contentEn:
-        "A team that is experienced, educated, and cares about customer satisfaction.",
-      contentRu:
-        "Команда, обладающая опытом, образованием и заботящаяся об удовлетворенности клиентов.",
-      icon: "icon-construction-worker",
-    },
-  ]);
+  ] = useCreateSectionMutation();
 
   const iconOptions = iconClasses.map((icon) => ({
     value: icon,
     label: <span className={`${icon} text-2xl text-red-500`} />,
   }));
 
-  const handleEdit = (record: any) => {
-    form.setFieldsValue(record);
+  const handleEdit = (record: Reason) => {
     setEditingReason(record);
     setOpenModal(true);
+    setReasonIndex(getSectionData?.data?.content.indexOf(record));
   };
 
-  const handleFormSubmit = (values: any) => {
-    // Handle form submission
-    console.log("Form submitted:", values);
+  const handleFormSubmit = async (values: any) => {
+    const targetReason = {
+      title: {
+        en: values.titleEn,
+        ru: values.titleRu,
+        tr: values.titleTr,
+      },
+      text: {
+        en: values.contentEn,
+        ru: values.contentRu,
+        tr: values.contentTr,
+      },
+      icon: values.icon,
+    };
+
+    const existingContent = getSectionData?.data?.content || [];
+
+    // Find and update the existing object if it exists
+    const updatedContent = existingContent.map((item: any, index: number) => {
+      if (index === reasonIndex) {
+        return { ...item, ...targetReason };
+      }
+      return item; // Keep other objects unchanged
+    });
+    const data = {
+      page: getSectionData?.data?.page?.id,
+      type: getSectionData?.data?.type,
+      sortId: getSectionData?.data?.sortId,
+      content: updatedContent,
+    };
+
+    try {
+      await createSectionFn(data).unwrap();
+      setOpenModal(false);
+      setEditingReason(null);
+      setReasonIndex(null);
+    } catch (error) {
+      console.error("Something went wrong", error);
+    }
   };
 
-  const reasonsColumn = [
+  const reasonsColumn: ColumnsType<Reason> = [
     {
       title: "Title (tr)",
-      dataIndex: "titleTr",
+      dataIndex: "title",
       key: "titleTr",
+      render: (text, record) => {
+        return <p>{text["tr"]}</p>;
+      },
     },
     {
       title: "Title (en)",
-      dataIndex: "titleEn",
+      dataIndex: "title",
       key: "titleEn",
+      render: (text, record) => {
+        return <p>{text["en"]}</p>;
+      },
     },
     {
       title: "Title (ru)",
-      dataIndex: "titleRu",
+      dataIndex: "title",
       key: "titleRu",
+      render: (text, record) => {
+        return <p>{text["ru"]}</p>;
+      },
     },
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: any, record: Reason) => (
         <div className="flex items-center gap-4 text-lg text-gray-500">
           <button
             type="button"
@@ -146,6 +145,37 @@ const ReasonSection = (props: Props) => {
     },
   ];
 
+  useEffect(() => {
+    if (editingReason) {
+      form.setFieldsValue({
+        titleTr: editingReason.title.tr,
+        titleEn: editingReason.title.en,
+        titleRu: editingReason.title.ru,
+        contentTr: editingReason.text.tr,
+        contentEn: editingReason.text.en,
+        contentRu: editingReason.text.ru,
+        icon: editingReason.icon,
+      });
+    }
+  }, [editingReason]);
+
+  useEffect(() => {
+    if (createSectionIsSuccess) {
+      toast.success(createSectionData.message);
+      getSectionRefetch();
+    }
+
+    if (createSectionIsError) {
+      const customError = createSectionError as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [
+    createSectionIsSuccess,
+    createSectionIsError,
+    createSectionError,
+    createSectionData,
+  ]);
+
   return (
     <>
       <div className="p-6 bg-white dark:bg-[#1e293b] shadow-md rounded-md">
@@ -156,7 +186,7 @@ const ReasonSection = (props: Props) => {
         {/* content */}
         <Table
           columns={reasonsColumn}
-          dataSource={reasonData}
+          dataSource={getSectionData?.data?.content || []}
           scroll={{ x: 768 }}
         />
       </div>
@@ -166,10 +196,12 @@ const ReasonSection = (props: Props) => {
         onCancel={() => {
           setOpenModal(false);
           setEditingReason(null);
+          setReasonIndex(null);
         }}
         onClose={() => {
           setOpenModal(false);
           setEditingReason(null);
+          setReasonIndex(null);
         }}
         open={openModal}
         width={{

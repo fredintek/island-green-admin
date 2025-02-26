@@ -2,13 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { Upload, UploadProps, message } from "antd";
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
-import {
-  deleteFromCloudinary,
-  uploadToCloudinary,
-} from "@/lib/cloudinaryUpload";
+import { uploadToCloudinary } from "@/lib/cloudinaryUpload";
 import { toast } from "react-toastify";
 import {
   useCreateSectionMutation,
+  useGetSectionByTypeQuery,
   useGetSectionQuery,
   useRemoveLinkFromSectionContentMutation,
 } from "@/redux/api/sectionApiSlice";
@@ -17,14 +15,6 @@ import { useDeleteFileFromCloudinaryMutation } from "@/redux/api/cloudinaryApiSl
 const { Dragger } = Upload;
 
 type Props = {};
-
-const defaultImages = [
-  "https://images.unsplash.com/photo-1736779580644-6b4268af4642?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw3fHx8ZW58MHx8fHx8",
-  "https://images.unsplash.com/photo-1735945205189-ead34d91cf69?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxNXx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1737741772139-5f8a9d4dd078?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1737901685093-c5e05706efcf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxNnx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1736230990003-a98eea26ea1f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw0MHx8fGVufDB8fHx8fA%3D%3D",
-];
 
 const UploadSection = (props: Props) => {
   const draggerProps: UploadProps = {
@@ -44,7 +34,18 @@ const UploadSection = (props: Props) => {
   };
   const [heroFileList, setHeroFileList] = useState<any>([]);
   const [uploadImageLoading, setUploadImageLoading] = useState<boolean>(false);
-  const [deleteImageLoading, setDeleteImageLoading] = useState<boolean>(false);
+
+  const {
+    data: getSectionData,
+    isLoading: getSectionIsLoading,
+    isError: getSectionIsError,
+    error: getSectionError,
+    refetch: getSectionRefetch,
+  } = useGetSectionByTypeQuery("hero", {
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
+  });
 
   const [
     createSectionFn,
@@ -56,20 +57,6 @@ const UploadSection = (props: Props) => {
       data: createSectionData,
     },
   ] = useCreateSectionMutation();
-
-  const {
-    data: getSectionData,
-    isLoading: getSectionIsLoading,
-    isError: getSectionIsError,
-    error: getSectionError,
-    refetch: getSectionRefetch,
-  } = useGetSectionQuery(14, {
-    refetchOnMountOrArgChange: true,
-    refetchOnReconnect: true,
-    refetchOnFocus: true,
-  });
-
-  console.log("getSectionData", getSectionData);
 
   const [
     removeLinkFn,
@@ -94,18 +81,18 @@ const UploadSection = (props: Props) => {
   ] = useDeleteFileFromCloudinaryMutation();
 
   const handleDeleteImage = async (publicId: string) => {
-    console.log("PUBLIC_ID", publicId);
     try {
-      // await deleteFromCloudinary(publicId, setDeleteImageLoading);
-      deleteFileFromCloudinaryFn({ publicId });
-      removeLinkFn({
-        sectionId: 14,
+      await deleteFileFromCloudinaryFn(publicId).unwrap();
+      await removeLinkFn({
+        sectionId: getSectionData.data.id,
         link: publicId,
-      });
+      }).unwrap();
     } catch (error) {
       console.error("Error during file upload:", error);
     }
   };
+
+  // console.log("getSectionData", getSectionData?.data);
 
   const handleSubmit = async () => {
     const imagesToUpload = heroFileList?.map(
@@ -117,17 +104,20 @@ const UploadSection = (props: Props) => {
         imagesToUpload,
         setUploadImageLoading
       );
-      console.log(uploadedImages);
       setHeroFileList([]);
 
       const data = {
-        page: 15,
-        type: "hero",
-        sortId: 0,
-        content: uploadedImages,
+        page: getSectionData?.data?.page?.id,
+        type: getSectionData?.data?.type,
+        sortId: getSectionData?.data?.sortId,
+        content: [
+          ...getSectionData?.data?.content,
+          ...(Array.isArray(uploadedImages)
+            ? uploadedImages
+            : [uploadedImages]),
+        ],
       };
-
-      createSectionFn(data);
+      await createSectionFn(data).unwrap();
     } catch (error) {
       console.error("Error during file upload:", error);
     }
@@ -136,6 +126,7 @@ const UploadSection = (props: Props) => {
   useEffect(() => {
     if (createSectionIsSuccess) {
       toast.success(createSectionData.message);
+      getSectionRefetch();
     }
 
     if (createSectionIsError) {
@@ -152,6 +143,7 @@ const UploadSection = (props: Props) => {
   useEffect(() => {
     if (removeLinkIsSuccess) {
       toast.success(removeLinkData.message);
+      getSectionRefetch();
     }
 
     if (removeLinkIsError) {
@@ -160,6 +152,26 @@ const UploadSection = (props: Props) => {
     }
   }, [removeLinkIsSuccess, removeLinkIsError, removeLinkError, removeLinkData]);
 
+  useEffect(() => {
+    if (deleteFileFromCloudinaryIsSuccess) {
+      // toast.success(deleteFileFromCloudinaryData.message);
+      getSectionRefetch();
+    }
+
+    if (deleteFileFromCloudinaryIsError) {
+      const customError = deleteFileFromCloudinaryError as {
+        data: any;
+        status: number;
+      };
+      toast.error(customError.data.message);
+    }
+  }, [
+    deleteFileFromCloudinaryIsSuccess,
+    deleteFileFromCloudinaryIsError,
+    deleteFileFromCloudinaryError,
+    deleteFileFromCloudinaryData,
+  ]);
+
   return (
     <div className="flex flex-col p-6 bg-white dark:bg-[#1e293b] shadow-md rounded-md">
       <p className="text-[22px] text-secondaryShade dark:text-primaryShade font-bold uppercase mb-2">
@@ -167,18 +179,17 @@ const UploadSection = (props: Props) => {
       </p>
       <div className="flex flex-col gap-6">
         {/* default hero images */}
-        {(defaultImages?.length as number) > 0 && (
+        {(getSectionData?.data?.content?.length as number) > 0 && (
           <div>
             <p className="text-lg text-black dark:text-gray-300 font-medium capitalize mb-2">
               Existing Hero Images
             </p>
-            <div className="grid grid-cols-fluid gap-4">
-              {getSectionData?.data?.content
-                ?.filter((item: any) => item.publicId)
-                ?.map((obj: { publicId: string; url: string }) => (
+            <div className="flex flex-wrap gap-10">
+              {getSectionData?.data?.content?.map(
+                (obj: { publicId: string; url: string }) => (
                   <div
                     key={obj.publicId}
-                    className="relative w-full aspect-video rounded-md overflow-hidden"
+                    className="relative max-w-[300px] w-full aspect-video rounded-md overflow-hidden"
                   >
                     <img
                       src={obj.url}
@@ -192,7 +203,8 @@ const UploadSection = (props: Props) => {
                       />
                     )}
                   </div>
-                ))}
+                )
+              )}
             </div>
           </div>
         )}
@@ -224,12 +236,16 @@ const UploadSection = (props: Props) => {
           type="button"
           className="ml-auto px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
           disabled={
-            uploadImageLoading || createSectionIsLoading || deleteImageLoading
+            uploadImageLoading ||
+            createSectionIsLoading ||
+            deleteFileFromCloudinaryIsLoading ||
+            removeLinkIsLoading
           }
         >
           {uploadImageLoading ||
           createSectionIsLoading ||
-          deleteImageLoading ? (
+          deleteFileFromCloudinaryIsLoading ||
+          removeLinkIsLoading ? (
             <div className="animate-spin border-t-2 border-white border-solid rounded-full w-5 h-5"></div> // Spinner
           ) : (
             <p className="uppercase font-medium">Submit</p>
