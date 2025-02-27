@@ -1,7 +1,6 @@
-import { apiSlice } from "./apiSlice";
+import apiSlice from ".";
 
 export const pageApiSlice = apiSlice.injectEndpoints({
-  overrideExisting: true,
   endpoints: (builder) => ({
     // Get All Pages
     getAllPages: builder.query({
@@ -10,6 +9,10 @@ export const pageApiSlice = apiSlice.injectEndpoints({
     // Get Page by ID
     getPageById: builder.query({
       query: (id) => `/page/${id}`,
+    }),
+    // Get Page by Slug
+    getPageBySlug: builder.query({
+      query: (slug: string) => `/page/name/${slug}`,
     }),
     // Create a new Page
     createPage: builder.mutation({
@@ -43,4 +46,5 @@ export const {
   useCreatePageMutation,
   useUpdatePageMutation,
   useDeletePageMutation,
+  useGetPageBySlugQuery,
 } = pageApiSlice;

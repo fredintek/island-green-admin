@@ -14,10 +14,10 @@ import {
 } from "@ant-design/icons";
 import { ConfigProvider, Menu, Tooltip } from "antd";
 import React, { JSX, useEffect, useState } from "react";
-import { useLogoutMutation } from "@/redux/api/authApiSlice";
 import { useGetAllPagesQuery } from "@/redux/api/pageApiSlice";
 import { Page } from "@/utils/interfaces";
 import { useLocale } from "next-intl";
+import { useLogoutMutation } from "@/redux/api/authApiSlice";
 
 type Props = {};
 
@@ -188,7 +188,7 @@ const Sidebar = (props: Props) => {
   // console.log("activeTopKey", activeTopKey);
 
   const mapPagesToMenuItems = (pages: Page[]): MenuItem[] => {
-    return pages.map((page) => {
+    return pages?.map((page) => {
       const menuItem: MenuItem = {
         key: page.slug,
         label: page.title[locale], // Assuming English as the default label
@@ -196,7 +196,7 @@ const Sidebar = (props: Props) => {
       };
 
       // If the page has subPages, we process them into nested items
-      if (page.subPages.length > 0) {
+      if (page.subPages.length > 0 && page.slug !== "blog") {
         menuItem.items = page.subPages.map((subPage) => ({
           key: subPage.slug,
           label: subPage.title[locale], // Assuming English as the default label
@@ -212,7 +212,7 @@ const Sidebar = (props: Props) => {
 
   // Render menu items recursively
   const renderMenuItems = (items: any) =>
-    items.map((item: any) => {
+    items?.map((item: any) => {
       if (item.items) {
         return {
           key: item.key,

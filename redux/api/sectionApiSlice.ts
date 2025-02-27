@@ -1,4 +1,4 @@
-import { apiSlice } from "./apiSlice";
+import apiSlice from ".";
 
 export const sectionApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,
@@ -53,6 +53,7 @@ export const sectionApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetSectionByPageIdQuery,
+  useLazyGetSectionByPageIdQuery,
   useUpdateSectionMutation,
   useCreateSectionMutation,
   useGetSectionQuery,

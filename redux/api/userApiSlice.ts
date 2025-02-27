@@ -1,4 +1,4 @@
-import { apiSlice } from "./apiSlice";
+import apiSlice from ".";
 
 export const userApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,

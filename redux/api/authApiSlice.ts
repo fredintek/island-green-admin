@@ -1,4 +1,4 @@
-import { apiSlice } from "./apiSlice";
+import apiSlice from ".";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,
@@ -12,20 +12,20 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    // logout
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+    }),
+
     // create user
     createUser: builder.mutation({
       query: ({ email, role }) => ({
         url: "/auth/create",
         method: "POST",
         body: { email, role },
-      }),
-    }),
-
-    // logout
-    logout: builder.mutation({
-      query: () => ({
-        url: "/auth/logout",
-        method: "POST",
       }),
     }),
 
@@ -51,7 +51,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
 export const {
   useLoginMutation,
   useCreateUserMutation,
-  useLogoutMutation,
   useForgotPasswordMutation,
+  useLogoutMutation,
   useResetPasswordMutation,
 } = authApiSlice;

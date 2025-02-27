@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import {
   useCreateSectionMutation,
   useGetSectionByTypeQuery,
-  useGetSectionQuery,
   useRemoveLinkFromSectionContentMutation,
 } from "@/redux/api/sectionApiSlice";
 import { useDeleteFileFromCloudinaryMutation } from "@/redux/api/cloudinaryApiSlice";
@@ -31,6 +30,7 @@ const UploadSection = (props: Props) => {
       }
     },
     listType: "picture-card",
+    accept: "image/*",
   };
   const [heroFileList, setHeroFileList] = useState<any>([]);
   const [uploadImageLoading, setUploadImageLoading] = useState<boolean>(false);
