@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 
-export const CommunicationApiSlice = apiSlice.injectEndpoints({
+export const communicationApiSlice = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     // Get All Communication
@@ -40,3 +40,11 @@ export const CommunicationApiSlice = apiSlice.injectEndpoints({
     }),
   }),
 });
+
+export const {
+  useCreateCommunicationMutation,
+  useGetAllCommunicationQuery,
+  useGetCommunicationByIdQuery,
+  useUpdateCommunicationMutation,
+  useDeleteCommunicationMutation,
+} = communicationApiSlice;

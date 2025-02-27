@@ -64,11 +64,7 @@ export interface ProjectHouse {
 
 export interface Page {
   id: number;
-  title: {
-    en: string;
-    ru: string;
-    tr: string;
-  };
+  title: MultiLanguage;
   slug: string;
   parentPage: Page | null;
   subPages: Page[];
@@ -76,4 +72,10 @@ export interface Page {
   projectHouse: ProjectHouse[];
   updatedAt: Date;
   deletedAt: Date | null;
+}
+
+export interface Faq {
+  id: number;
+  question: MultiLanguage;
+  answer: MultiLanguage;
 }

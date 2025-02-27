@@ -1,8 +1,18 @@
 "use client";
+import {
+  useCreateFaqMutation,
+  useDeleteFaqMutation,
+  useGetAllFaqsQuery,
+  useUpdateFaqMutation,
+} from "@/redux/api/faqApislice";
+import { Faq } from "@/utils/interfaces";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form, Input, Modal, Popconfirm, Table, Tooltip, Upload } from "antd";
+import { ColumnsType } from "antd/es/table";
+import { useLocale } from "next-intl";
 import dynamic from "next/dynamic";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -12,82 +22,119 @@ const page = (props: Props) => {
     () => dynamic(() => import("react-quill-new"), { ssr: false }),
     []
   );
+  const locale = useLocale();
   const [form] = Form.useForm();
   const [openModal, setOpenModal] = useState(false);
-  const [editingFaq, setEditingFaq] = useState<any>(null);
-  const [faqData, setFaqData] = useState<any[]>([
-    {
-      titleEn:
-        "What are the Title Deed Types in Northern Cyprus and the differences between them?",
-      contentEn:
-        'In Northern Cyprus, the word "kokan" is generally used instead of the word "tapu". In our country, the types of kokan vary and there are 3 different types of kokan in total.<br /><br />1. Turkish<br /><br />2. Equivalent Title Deed<br /><br />3. Allocation Form',
-      titleTr:
-        "Kuzey Kıbrıs'ta Tapu Çeşitleri Nelerdir ve Aralarındaki Farklar Nelerdir?",
-      contentTr:
-        'Kuzey Kıbrıs\'ta "tapu" kelimesi yerine genellikle "kokan" kelimesi kullanılır. Ülkemizde kokan çeşitleri farklılık göstermektedir ve toplamda 3 farklı kokan türü bulunmaktadır.<br /><br />1. Türk Tapusu<br /><br />2. Eşdeğer Tapu<br /><br />3. Tahsis Tapusu',
-      titleRu:
-        "Какие существуют виды прав собственности в Северном Кипре и в чем их различия?",
-      contentRu:
-        'В Северном Кипре вместо слова "tapu" обычно используется слово "kokan". В нашей стране существуют разные виды kokan, и всего их три.<br /><br />1. Турецкий<br /><br />2. Эквивалентный титул<br /><br />3. Форма распределения',
-    },
-    {
-      titleEn: "What is the Stamp Duty and Who Pays It?",
-      contentEn:
-        "Title Deed Fee: It is a fee calculated as 4% of the sales price declared in the title deed for all real estates sold such as residences, workplaces, plots, fields, lands, etc.<br /><br />Who Pays the Title Deed Fee: According to the decision of the Council of Ministers, 20 per thousand (2%) of the real estate is collected separately from the seller and the buyer.",
-      titleTr: "Damga Vergisi Nedir ve Kim Öder?",
-      contentTr:
-        "Tapu Harcı: Konut, iş yeri, arsa, tarla, arazi gibi satılan tüm gayrimenkuller için tapuda beyan edilen satış bedelinin %4'ü olarak hesaplanan bir harçtır.<br /><br />Tapu Harcını Kim Öder: Bakanlar Kurulu kararına göre, taşınmazın %2’si satıcıdan ve %2’si alıcıdan ayrı ayrı tahsil edilmektedir.",
-      titleRu: "Что такое гербовый сбор и кто его оплачивает?",
-      contentRu:
-        "Сбор за право собственности: Это сбор, рассчитываемый как 4% от заявленной в титуле собственности цены продажи всех продаваемых объектов недвижимости, таких как жилье, офисы, участки, поля и земли.<br /><br />Кто платит гербовый сбор: Согласно решению Совета Министров, 20 промилле (2%) от стоимости недвижимости взимается отдельно с продавца и покупателя.",
-    },
-    {
-      titleEn: "Can I buy real estate without coming to Northern Cyprus?",
-      contentEn:
-        "Yes. It can be obtained with a power of attorney issued in accordance with TRNC legislation.",
-      titleTr: "Kuzey Kıbrıs'a Gelmeden Gayrimenkul Satın Alabilir Miyim?",
-      contentTr:
-        "Evet. KKTC mevzuatına uygun olarak düzenlenmiş bir vekaletname ile alınabilir.",
-      titleRu: "Могу ли я купить недвижимость, не приезжая в Северный Кипр?",
-      contentRu:
-        "Да. Это можно сделать по доверенности, оформленной в соответствии с законодательством ТРСК.",
-    },
-  ]);
+  const [editingFaq, setEditingFaq] = useState<Faq | null>(null);
 
-  const handleEdit = (record: any) => {
-    form.setFieldsValue(record);
+  const {
+    data: getAllFaqData,
+    isLoading: getAllFaqIsLoading,
+    isError: getAllFaqIsError,
+    error: getAllFaqError,
+    refetch: getAllFaqRefetch,
+  } = useGetAllFaqsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
+  });
+
+  const [
+    createFaqFn,
+    {
+      isError: createFaqIsError,
+      isLoading: createFaqIsLoading,
+      isSuccess: createFaqIsSuccess,
+      error: createFaqError,
+      data: createFaqData,
+    },
+  ] = useCreateFaqMutation();
+
+  const [
+    updateFaqFn,
+    {
+      isError: updateFaqIsError,
+      isLoading: updateFaqIsLoading,
+      isSuccess: updateFaqIsSuccess,
+      error: updateFaqError,
+      data: updateFaqData,
+    },
+  ] = useUpdateFaqMutation();
+
+  const [
+    deleteFaqFn,
+    {
+      isError: deleteFaqIsError,
+      isLoading: deleteFaqIsLoading,
+      isSuccess: deleteFaqIsSuccess,
+      error: deleteFaqError,
+      data: deleteFaqData,
+    },
+  ] = useDeleteFaqMutation();
+
+  const handleEdit = (record: Faq) => {
     setEditingFaq(record);
     setOpenModal(true);
   };
 
-  const handleDelete = (record: any) => {
-    console.log("Record Deleted", record);
+  const handleDelete = async (record: Faq) => {
+    try {
+      await deleteFaqFn(record?.id).unwrap();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleFormSubmit = (values: any) => {
-    console.log("values", values);
+  const handleFormSubmit = async (values: any) => {
+    const targetFaq = {
+      question: {
+        en: values.questionEn,
+        ru: values.questionRu,
+        tr: values.questionTr,
+      },
+      answer: {
+        en: values.answerEn,
+        ru: values.answerRu,
+        tr: values.answerTr,
+      },
+    };
+
+    try {
+      if (editingFaq) {
+        await updateFaqFn({ id: editingFaq?.id, ...targetFaq }).unwrap();
+      } else {
+        await createFaqFn(targetFaq).unwrap();
+      }
+      setOpenModal(false);
+      setEditingFaq(null);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const faqColumn = [
+  const faqColumn: ColumnsType<Faq> = [
     {
-      title: "Title (tr)",
-      dataIndex: "titleTr",
-      key: "titleTr",
+      title: "Question (tr)",
+      dataIndex: "question",
+      key: "questionTr",
+      render: (text, record) => text["tr"],
     },
     {
-      title: "Title (en)",
-      dataIndex: "titleEn",
-      key: "titleEn",
+      title: "Question (en)",
+      dataIndex: "question",
+      key: "questionEn",
+      render: (text, record) => text["en"],
     },
     {
-      title: "Title (ru)",
-      dataIndex: "titleRu",
-      key: "titleRu",
+      title: "Question (ru)",
+      dataIndex: "question",
+      key: "questionRu",
+      render: (text, record) => text["ru"],
     },
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: any, record: Faq) => (
         <div className="flex items-center gap-4 text-lg text-gray-500">
           <button
             type="button"
@@ -111,6 +158,55 @@ const page = (props: Props) => {
     },
   ];
 
+  useEffect(() => {
+    if (editingFaq) {
+      form.setFieldsValue({
+        questionTr: editingFaq.question.tr,
+        questionEn: editingFaq.question.en,
+        questionRu: editingFaq.question.ru,
+        answerTr: editingFaq.answer.tr,
+        answerEn: editingFaq.answer.en,
+        answerRu: editingFaq.answer.ru,
+      });
+    }
+  }, [editingFaq]);
+
+  useEffect(() => {
+    if (deleteFaqIsSuccess) {
+      toast.success(deleteFaqData.message);
+      getAllFaqRefetch();
+    }
+
+    if (deleteFaqIsError) {
+      const customError = deleteFaqError as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [deleteFaqIsSuccess, deleteFaqIsError, deleteFaqError, deleteFaqData]);
+
+  useEffect(() => {
+    if (createFaqIsSuccess) {
+      toast.success(createFaqData.message);
+      getAllFaqRefetch();
+    }
+
+    if (createFaqIsError) {
+      const customError = createFaqError as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [createFaqIsSuccess, createFaqIsError, createFaqError, createFaqData]);
+
+  useEffect(() => {
+    if (updateFaqIsSuccess) {
+      toast.success(updateFaqData.message);
+      getAllFaqRefetch();
+    }
+
+    if (updateFaqIsError) {
+      const customError = updateFaqError as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [updateFaqIsSuccess, updateFaqIsError, updateFaqError, updateFaqData]);
+
   return (
     <>
       <div className="p-6 bg-white dark:bg-[#1e293b] shadow-md rounded-md">
@@ -133,7 +229,7 @@ const page = (props: Props) => {
           </button>
           <Table
             columns={faqColumn}
-            dataSource={faqData}
+            dataSource={getAllFaqData?.data || []}
             scroll={{ x: 768 }}
             className=""
           />
@@ -159,61 +255,67 @@ const page = (props: Props) => {
         <Form onFinish={handleFormSubmit} layout="vertical" form={form}>
           <div className="grid grid-cols-fluid-1 gap-4">
             <Form.Item
-              label="Title (Turkish)"
-              name="titleTr"
-              rules={[{ required: true, message: "Title is required!" }]}
+              label="Question (Turkish)"
+              name="questionTr"
+              rules={[{ required: true, message: "Question is required!" }]}
             >
-              <Input size="large" placeholder="Enter title in Turkish" />
+              <Input size="large" placeholder="Enter question in Turkish" />
             </Form.Item>
             <Form.Item
-              label="Title (English)"
-              name="titleEn"
-              rules={[{ required: true, message: "Title is required!" }]}
+              label="Question (English)"
+              name="questionEn"
+              rules={[{ required: true, message: "Question is required!" }]}
             >
-              <Input size="large" placeholder="Enter title in English" />
+              <Input size="large" placeholder="Enter question in English" />
             </Form.Item>
             <Form.Item
-              label="Title (Russian)"
-              name="titleRu"
-              rules={[{ required: true, message: "Title is required!" }]}
+              label="Question (Russian)"
+              name="questionRu"
+              rules={[{ required: true, message: "Question is required!" }]}
             >
-              <Input size="large" placeholder="Enter title in Russian" />
+              <Input size="large" placeholder="Enter question in Russian" />
             </Form.Item>
           </div>
 
           <div className="grid grid-cols-fluid-1 gap-4">
             <Form.Item
-              rules={[{ required: true, message: "Content is required!" }]}
-              label="Content (Turkish)"
-              name="contentTr"
+              rules={[{ required: true, message: "Answer is required!" }]}
+              label="Answer (Turkish)"
+              name="answerTr"
             >
-              <ReactQuill theme="snow" placeholder="Enter content in Turkish" />
+              <ReactQuill theme="snow" placeholder="Enter answer in Turkish" />
             </Form.Item>
             <Form.Item
-              label="Content (English)"
-              name="contentEn"
-              rules={[{ required: true, message: "Content is required!" }]}
+              label="Answer (English)"
+              name="answerEn"
+              rules={[{ required: true, message: "Answer is required!" }]}
             >
-              <ReactQuill theme="snow" placeholder="Enter content in English" />
+              <ReactQuill theme="snow" placeholder="Enter answer in English" />
             </Form.Item>
             <Form.Item
-              rules={[{ required: true, message: "Content is required!" }]}
-              label="Content (Russian)"
-              name="contentRu"
+              rules={[{ required: true, message: "Answer is required!" }]}
+              label="Answer (Russian)"
+              name="answerRu"
             >
-              <ReactQuill theme="snow" placeholder="Enter content in Russian" />
+              <ReactQuill theme="snow" placeholder="Enter answer in Russian" />
             </Form.Item>
           </div>
         </Form>
-
         <button
           onClick={() => form.submit()}
           type="button"
-          className="ml-auto mt-4 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
+          className="ml-auto px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
+          disabled={
+            deleteFaqIsLoading || updateFaqIsLoading || createFaqIsLoading
+          }
         >
-          <p className="uppercase font-medium">
-            {editingFaq ? "Save" : "Submit"}
-          </p>
+          {deleteFaqIsLoading || updateFaqIsLoading || createFaqIsLoading ? (
+            <div className="animate-spin border-t-2 border-white border-solid rounded-full w-5 h-5"></div> // Spinner
+          ) : (
+            <p className="uppercase font-medium">
+              {editingFaq ? "Save" : "Submit"}
+            </p>
+          )}
         </button>
       </Modal>
     </>

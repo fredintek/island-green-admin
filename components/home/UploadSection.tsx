@@ -82,7 +82,7 @@ const UploadSection = (props: Props) => {
 
   const handleDeleteImage = async (publicId: string) => {
     try {
-      await deleteFileFromCloudinaryFn(publicId).unwrap();
+      await deleteFileFromCloudinaryFn({ publicId }).unwrap();
       await removeLinkFn({
         sectionId: getSectionData.data.id,
         link: publicId,

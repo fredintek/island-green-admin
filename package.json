@@ -19,6 +19,7 @@
     "@reduxjs/toolkit": "^2.5.0",
     "antd": "^5.23.0",
     "axios": "^1.7.9",
+    "html-to-text": "^9.0.5",
     "next": "15.1.0",
     "next-intl": "^3.26.3",
     "react": "^19.0.0",
