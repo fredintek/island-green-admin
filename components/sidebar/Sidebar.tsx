@@ -181,11 +181,11 @@ const Sidebar = (props: Props) => {
     isLoading: getAllPagesIsLoading,
     isSuccess: getAllPagesIsSuccess,
     error: getAllPagesError,
-  } = useGetAllPagesQuery(undefined);
-
-  // console.log("getAllPagesData -->", getAllPagesData);
-  // console.log("activeSubKey", activeSubKey);
-  // console.log("activeTopKey", activeTopKey);
+  } = useGetAllPagesQuery(undefined, {
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMountOrArgChange: true,
+  });
 
   const mapPagesToMenuItems = (pages: Page[]): MenuItem[] => {
     return pages?.map((page) => {
@@ -196,7 +196,11 @@ const Sidebar = (props: Props) => {
       };
 
       // If the page has subPages, we process them into nested items
-      if (page.subPages.length > 0 && page.slug !== "blog") {
+      if (
+        page.subPages.length > 0 &&
+        page.slug !== "blog" &&
+        page.slug !== "projects"
+      ) {
         menuItem.items = page.subPages.map((subPage) => ({
           key: subPage.slug,
           label: subPage.title[locale], // Assuming English as the default label
@@ -245,10 +249,12 @@ const Sidebar = (props: Props) => {
 
   useEffect(() => {
     // Find active top-level menu item
-    const activeMenuItem = mapPagesToMenuItems(getAllPagesData).find((item) => {
-      if (item.link) return pathname === item.link;
-      return item.items?.some((subItem) => pathname === subItem.link);
-    });
+    const activeMenuItem = mapPagesToMenuItems(getAllPagesData)?.find(
+      (item) => {
+        if (item.link) return pathname === item.link;
+        return item.items?.some((subItem) => pathname === subItem.link);
+      }
+    );
 
     // Extract submenu key if applicable
     const activeSubItem = activeMenuItem?.items?.find(

@@ -4,6 +4,7 @@ import {
   useGetAllCommunicationQuery,
   useUpdateCommunicationMutation,
 } from "@/redux/api/communicationApiSlice";
+import { stripHtml } from "@/utils";
 import { Form, Input } from "antd";
 import dynamic from "next/dynamic";
 import React, { useEffect, useMemo, useState } from "react";
@@ -55,10 +56,6 @@ const page = (props: Props) => {
   ] = useUpdateCommunicationMutation();
 
   const handleFormSubmit = async (values: any) => {
-    function stripHtml(html: string) {
-      return html.replace(/<[^>]*>/g, "").trim();
-    }
-
     const cleanedData = {
       telephone: stripHtml(values.telephone),
       email: stripHtml(values.email),

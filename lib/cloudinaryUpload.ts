@@ -7,13 +7,13 @@ const CLOUDINARY_UPLOAD_PRESET =
 
 export const uploadToCloudinary = async (
   files: File | File[],
-  setLoading: (loading: boolean) => void
+  setLoading?: (loading: boolean) => void
 ): Promise<
   { publicId: string; url: string } | { publicId: string; url: string }[]
 > => {
   if (!files) throw new Error("No file provided");
 
-  setLoading(true); // Set loading state to true
+  setLoading && setLoading(true); // Set loading state to true
 
   const uploadFile = async (file: File) => {
     const formData = new FormData();
@@ -40,7 +40,7 @@ export const uploadToCloudinary = async (
   // If input is a single file, return a single URL
   if (!Array.isArray(files)) {
     const result = await uploadFile(files);
-    setLoading(false); // Set loading state to false once done
+    setLoading && setLoading(false); // Set loading state to false once done
     return result;
   }
 
@@ -49,11 +49,11 @@ export const uploadToCloudinary = async (
 
   try {
     const result = await Promise.all(uploadPromises);
-    setLoading(false); // Set loading state to false once done
-    toast.success("Files uploaded successfully!");
+    setLoading && setLoading(false); // Set loading state to false once done
+    // toast.success("Files uploaded successfully!");
     return result;
   } catch (error) {
-    setLoading(false); // Set loading state to false even on error
+    setLoading && setLoading(false); // Set loading state to false even on error
     toast.error("Error uploading files");
     throw error;
   }

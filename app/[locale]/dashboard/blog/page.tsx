@@ -1,10 +1,14 @@
 "use client";
-import { useGetPageBySlugQuery } from "@/redux/api/pageApiSlice";
+import {
+  useCreatePageMutation,
+  useDeletePageMutation,
+  useGetPageBySlugQuery,
+  useUpdatePageMutation,
+} from "@/redux/api/pageApiSlice";
 import { Page } from "@/utils/interfaces";
 import {
   DeleteOutlined,
   EditOutlined,
-  EyeOutlined,
   InboxOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
@@ -13,19 +17,17 @@ import { ColumnsType } from "antd/es/table";
 import { useLocale } from "next-intl";
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { useLazyGetSectionByPageIdQuery } from "@/redux/api/sectionApiSlice";
+import {
+  useCreateSectionMutation,
+  useLazyGetSectionByPageIdQuery,
+  useRemoveLinkFromSectionContentMutation,
+  useUpdateSectionMutation,
+} from "@/redux/api/sectionApiSlice";
+import { uploadToCloudinary } from "@/lib/cloudinaryUpload";
+import { toast } from "react-toastify";
+import { useDeleteFileFromCloudinaryMutation } from "@/redux/api/cloudinaryApiSlice";
+import { stripHtml } from "@/utils";
 const { Dragger } = Upload;
-
-const testDefault = [
-  {
-    publicId: "rxyaakzyzqgpeorvof8p",
-    url: "https://res.cloudinary.com/dlvv45itb/image/upload/v1740580034/rxyaakzyzqgpeorvof8p.png",
-  },
-  {
-    publicId: "yp9hgdrjyjsibzuqkq1x",
-    url: "https://res.cloudinary.com/dlvv45itb/image/upload/v1740660332/yp9hgdrjyjsibzuqkq1x.jpg",
-  },
-];
 
 type Props = {};
 
@@ -62,13 +64,93 @@ const page = (props: Props) => {
     },
   ] = useLazyGetSectionByPageIdQuery();
 
+  const [
+    createPageFn,
+    {
+      isError: createPageIsError,
+      isLoading: createPageIsLoading,
+      isSuccess: createPageIsSuccess,
+      error: createPageError,
+      data: createPageData,
+    },
+  ] = useCreatePageMutation();
+
+  const [
+    updatePageFn,
+    {
+      isError: updatePageIsError,
+      isLoading: updatePageIsLoading,
+      isSuccess: updatePageIsSuccess,
+      error: updatePageError,
+      data: updatePageData,
+    },
+  ] = useUpdatePageMutation();
+
+  const [
+    deletePageFn,
+    {
+      isError: deletePageIsError,
+      isLoading: deletePageIsLoading,
+      isSuccess: deletePageIsSuccess,
+      error: deletePageError,
+      data: deletePageData,
+    },
+  ] = useDeletePageMutation();
+
+  const [
+    createSectionFn,
+    {
+      isError: createSectionIsError,
+      isLoading: createSectionIsLoading,
+      isSuccess: createSectionIsSuccess,
+      error: createSectionError,
+      data: createSectionData,
+    },
+  ] = useCreateSectionMutation();
+
+  const [
+    updateSectionFn,
+    {
+      isError: updateSectionIsError,
+      isLoading: updateSectionIsLoading,
+      isSuccess: updateSectionIsSuccess,
+      error: updateSectionError,
+      data: updateSectionData,
+    },
+  ] = useUpdateSectionMutation();
+
+  const [
+    deleteFileFromCloudinaryFn,
+    {
+      isError: deleteFileFromCloudinaryIsError,
+      isLoading: deleteFileFromCloudinaryIsLoading,
+      isSuccess: deleteFileFromCloudinaryIsSuccess,
+      error: deleteFileFromCloudinaryError,
+      data: deleteFileFromCloudinaryData,
+    },
+  ] = useDeleteFileFromCloudinaryMutation();
+
+  const [
+    removeLinkFn,
+    {
+      isError: removeLinkIsError,
+      isLoading: removeLinkIsLoading,
+      isSuccess: removeLinkIsSuccess,
+      error: removeLinkError,
+      data: removeLinkData,
+    },
+  ] = useRemoveLinkFromSectionContentMutation();
+
   const handleEdit = async (record: Partial<Page>) => {
-    console.log("record", record);
-    await getSectionByPageIdFn(record?.id);
+    const sections = await getSectionByPageIdFn(record?.id).unwrap();
+    // console.log("sections", sections);
+    const targetSection = sections?.data.find(
+      (obj: any) => obj.type === "blog-content"
+    );
     setEditingPage(record);
     setOpenModal(true);
     setBlogFileList(
-      testDefault.map((img) => ({
+      targetSection?.content?.blogImages?.map((img: any) => ({
         uid: img.publicId,
         name: "image",
         status: "done",
@@ -76,7 +158,16 @@ const page = (props: Props) => {
       }))
     );
     form.setFieldsValue({
-      blogImages: testDefault.map((img) => ({
+      pageTitleTr: record?.title?.tr,
+      pageTitleEn: record?.title?.en,
+      pageTitleRu: record?.title?.ru,
+      blogTitleTr: targetSection?.content?.blogTitle?.tr,
+      blogTitleEn: targetSection?.content?.blogTitle?.en,
+      blogTitleRu: targetSection?.content?.blogTitle?.ru,
+      blogContentTr: targetSection?.content?.blogContent?.tr,
+      blogContentEn: targetSection?.content?.blogContent?.en,
+      blogContentRu: targetSection?.content?.blogContent?.ru,
+      blogImages: targetSection?.content?.blogImages?.map((img: any) => ({
         uid: img.publicId,
         name: "image",
         status: "done",
@@ -91,7 +182,152 @@ const page = (props: Props) => {
   };
 
   const handleFormSubmit = async (values: any) => {
-    console.log("values", values);
+    if (editingPage) {
+      try {
+        const sections = await getSectionByPageIdFn(editingPage?.id).unwrap();
+        // console.log("sections", sections);
+        const targetSection = sections?.data.find(
+          (obj: any) => obj.type === "blog-content"
+        );
+
+        const oldBlogImages = targetSection?.content?.blogImages;
+
+        // update page
+        const updatedPage = await updatePageFn({
+          id: editingPage.id,
+          title: {
+            tr: values.pageTitleTr,
+            en: values.pageTitleEn,
+            ru: values.pageTitleRu,
+          },
+          parentPage: getAllPageBySlugData?.id,
+        }).unwrap();
+        // update section for target page
+        if (updatedPage?.id) {
+          const uploadedImages = await uploadToCloudinary(
+            values?.blogImages
+              ?.filter((obj: any) => !obj.url)
+              ?.map((obj: any) => obj.originFileObj) as File[]
+          );
+
+          const updatedSection = await updateSectionFn({
+            id: targetSection?.id,
+            page: updatedPage?.id,
+            type: "blog-content",
+            sortId: 0,
+            content: {
+              blogTitle: {
+                tr: values.blogTitleTr,
+                en: values.blogTitleEn,
+                ru: values.blogTitleRu,
+              },
+              blogContent: {
+                tr: stripHtml(values.blogTitleTr),
+                en: stripHtml(values.blogTitleEn),
+                ru: stripHtml(values.blogTitleRu),
+              },
+              blogImages: [
+                ...values?.blogImages?.filter((obj: any) => obj.url),
+                ...(Array.isArray(uploadedImages) ? uploadedImages : []),
+              ],
+            },
+          }).unwrap();
+
+          if (updatedSection?.content) {
+            const newBlogImages = updatedSection?.content?.blogImages;
+
+            // Function to find images in old that are NOT in new
+            const imagesToDelete = oldBlogImages?.filter(
+              (oldImage: any) =>
+                !newBlogImages.some(
+                  (newImage: any) => newImage.url === oldImage.url
+                )
+            );
+
+            // delete old blog images from server
+            if (imagesToDelete.length > 0) {
+              await Promise.all(
+                imagesToDelete?.map(async (img: any) => {
+                  await deleteFileFromCloudinaryFn({
+                    publicId: img.publicId,
+                  }).unwrap();
+                  await removeLinkFn({
+                    sectionId: targetSection?.id,
+                    link: img.publicId,
+                  }).unwrap();
+                })
+              );
+            }
+          }
+        }
+
+        setOpenModal(false);
+        setEditingPage(null);
+        setBlogFileList([]);
+      } catch (error) {
+        console.error("error", error);
+      }
+    } else {
+      try {
+        // create page
+        const createdPage = await createPageFn({
+          title: {
+            tr: values.pageTitleTr,
+            en: values.pageTitleEn,
+            ru: values.pageTitleRu,
+          },
+          parentPage: getAllPageBySlugData?.id,
+        }).unwrap();
+
+        // create section for target page
+        if (createdPage?.data) {
+          await createSectionFn({
+            page: createdPage.data.id,
+            type: "blog-content",
+            sortId: 0,
+            content: {
+              blogTitle: {
+                tr: values.blogTitleTr,
+                en: values.blogTitleEn,
+                ru: values.blogTitleRu,
+              },
+              blogContent: {
+                tr: stripHtml(values.blogTitleTr),
+                en: stripHtml(values.blogTitleEn),
+                ru: stripHtml(values.blogTitleRu),
+              },
+              blogImages: await uploadToCloudinary(
+                values?.blogImages?.map((obj: any) => obj.originFileObj)
+              ),
+            },
+          }).unwrap();
+        }
+        setOpenModal(false);
+        setEditingPage(null);
+        setBlogFileList([]);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const handleDeletePage = async (record: Partial<Page>) => {
+    const sections = await getSectionByPageIdFn(record?.id).unwrap();
+    const targetSection = sections?.data.find(
+      (obj: any) => obj.type === "blog-content"
+    );
+    try {
+      await deletePageFn(record?.id).unwrap();
+      await Promise.all(
+        targetSection?.content?.blogImages?.map(async (img: any) => {
+          await deleteFileFromCloudinaryFn({
+            publicId: img.publicId,
+          }).unwrap();
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const blogColumn: ColumnsType<Partial<Page>> = [
@@ -108,16 +344,14 @@ const page = (props: Props) => {
         <div className="flex items-center gap-4 text-lg text-gray-500">
           <button type="button" className="cursor-pointer">
             <Tooltip>
-              <EyeOutlined />
-            </Tooltip>
-          </button>
-          <button type="button" className="cursor-pointer">
-            <Tooltip>
               <EditOutlined onClick={() => handleEdit(record)} />
             </Tooltip>
           </button>
           <button type="button" className="cursor-pointer">
-            <Popconfirm title="Are you sure you want to delete this project?">
+            <Popconfirm
+              onConfirm={() => handleDeletePage(record)}
+              title="Are you sure you want to delete this project?"
+            >
               <DeleteOutlined />
             </Popconfirm>
           </button>
@@ -126,8 +360,70 @@ const page = (props: Props) => {
     },
   ];
 
-  console.log("blogFileList", blogFileList);
-  console.log("getSectionByPageIdData", getSectionByPageIdData?.data);
+  useEffect(() => {
+    if (createSectionIsSuccess) {
+      getAllPageBySlugRefetch();
+    }
+    if (createPageIsError) {
+      const customError = createPageError as { data: any; status: number };
+      toast.error(customError.data.message);
+    }
+  }, [createPageIsSuccess, createPageIsError, createPageError, createPageData]);
+
+  useEffect(() => {
+    if (createSectionIsSuccess) {
+      toast.success("Page created successfully");
+      getAllPageBySlugRefetch();
+    }
+
+    if (createSectionIsError) {
+      const customError = createSectionError as {
+        data: any;
+        status: number;
+      };
+      toast.error(customError.data.message);
+    }
+  }, [
+    createSectionIsSuccess,
+    createSectionIsError,
+    createSectionError,
+    createSectionData,
+  ]);
+
+  useEffect(() => {
+    if (updateSectionIsSuccess) {
+      toast.success("Page updated successfully");
+      getAllPageBySlugRefetch();
+    }
+
+    if (updateSectionIsError) {
+      const customError = updateSectionError as {
+        data: any;
+        status: number;
+      };
+      toast.error(customError.data.message);
+    }
+  }, [
+    updateSectionIsSuccess,
+    updateSectionIsError,
+    updateSectionError,
+    updateSectionData,
+  ]);
+
+  useEffect(() => {
+    if (deletePageIsSuccess) {
+      toast.success("Page deleted successfully");
+      getAllPageBySlugRefetch();
+    }
+
+    if (deletePageIsError) {
+      const customError = deletePageError as {
+        data: any;
+        status: number;
+      };
+      toast.error(customError.data.message);
+    }
+  }, [deletePageIsSuccess, deletePageIsError, deletePageError, deletePageData]);
 
   return (
     <section className="flex flex-col gap-10">
@@ -141,6 +437,7 @@ const page = (props: Props) => {
             onClick={() => {
               setOpenModal(true);
               setEditingPage(null);
+              setBlogFileList([]);
               form.resetFields();
             }}
             type="button"
@@ -158,7 +455,7 @@ const page = (props: Props) => {
         </div>
       </div>
 
-      {/* add/edit FAQ */}
+      {/* add/edit Blog */}
       <Modal
         onCancel={() => {
           setOpenModal(false);
@@ -292,9 +589,21 @@ const page = (props: Props) => {
           onClick={() => form.submit()}
           type="button"
           className="ml-auto mt-2 px-6 py-2 rounded-md text-white cursor-pointer flex items-center justify-center bg-secondaryShade dark:bg-primaryShade border border-secondaryShade dark:border-primaryShade hover:bg-transparent hover:text-secondaryShade dark:hover:bg-transparent dark:hover:text-primaryShade transition-colors duration-300"
-          disabled={false}
+          disabled={
+            createPageIsLoading ||
+            createSectionIsLoading ||
+            updatePageIsLoading ||
+            updateSectionIsLoading ||
+            deleteFileFromCloudinaryIsLoading ||
+            removeLinkIsLoading
+          }
         >
-          {false ? (
+          {createPageIsLoading ||
+          createSectionIsLoading ||
+          updatePageIsLoading ||
+          updateSectionIsLoading ||
+          deleteFileFromCloudinaryIsLoading ||
+          removeLinkIsLoading ? (
             <div className="animate-spin border-t-2 border-white border-solid rounded-full w-5 h-5"></div> // Spinner
           ) : (
             <p className="uppercase font-medium">
