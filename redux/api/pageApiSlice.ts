@@ -1,6 +1,7 @@
 import apiSlice from ".";
 
 export const pageApiSlice = apiSlice.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     // Get All Pages
     getAllPages: builder.query({
@@ -22,6 +23,14 @@ export const pageApiSlice = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    // Create a bulk project Page
+    createBulkProjectPage: builder.mutation({
+      query: (body) => ({
+        url: "/page/bulk-project",
+        method: "POST",
+        body,
+      }),
+    }),
     // Update a Page
     updatePage: builder.mutation({
       query: (body) => ({
@@ -37,6 +46,14 @@ export const pageApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+
+    // Delete a Page
+    deleteBulkProject: builder.mutation({
+      query: (id) => ({
+        url: `/page/bulk-project/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -47,4 +64,7 @@ export const {
   useUpdatePageMutation,
   useDeletePageMutation,
   useGetPageBySlugQuery,
+  useLazyGetPageBySlugQuery,
+  useCreateBulkProjectPageMutation,
+  useDeleteBulkProjectMutation,
 } = pageApiSlice;

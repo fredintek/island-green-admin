@@ -20,11 +20,17 @@ export const uploadToCloudinary = async (
     formData.append("file", file);
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET || "");
 
+    // Determine resource type based on file type
+    const resourceType = file.type.includes("pdf") ? "raw" : "auto";
+
     try {
       const response = await axios.post(
         `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          params: { resource_type: resourceType },
+        }
       );
 
       return {
