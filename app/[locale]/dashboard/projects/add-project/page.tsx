@@ -314,7 +314,7 @@ const page = (props: Props) => {
                   rules={[
                     {
                       required: true,
-                      message: "Please upload two image!",
+                      message: "You must upload an image!",
                     },
                   ]}
                 >
