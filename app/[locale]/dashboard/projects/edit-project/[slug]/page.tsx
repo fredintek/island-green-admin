@@ -92,7 +92,10 @@ const page = (props: Props) => {
             Stage Gallery
           </p>
 
-          <StageGallery />
+          <StageGallery
+            pageData={getAllPageBySlugData}
+            refetchEditedData={getPageBySlugFn}
+          />
         </div>
 
         {/* location */}
@@ -101,7 +104,10 @@ const page = (props: Props) => {
             Project Location
           </p>
 
-          <ProjectLocation />
+          <ProjectLocation
+            pageData={getAllPageBySlugData}
+            refetchEditedData={getPageBySlugFn}
+          />
         </div>
 
         {/* youtube videos */}
@@ -110,7 +116,10 @@ const page = (props: Props) => {
             Youtube Videos
           </p>
 
-          <YoutubeVideos />
+          <YoutubeVideos
+            pageData={getAllPageBySlugData}
+            refetchEditedData={getPageBySlugFn}
+          />
         </div>
       </div>
     </section>

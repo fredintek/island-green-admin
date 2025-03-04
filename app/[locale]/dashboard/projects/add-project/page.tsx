@@ -35,27 +35,22 @@ const page = (props: Props) => {
   const [projectPdfList, setProjectPdfList] = useState<any>([]);
   const [projectHomeImageList, setProjectHomeImageList] = useState<any>([]);
   const [projectHouseGallery, setProjectHouseGallery] = useState<any>([]);
-  const [stage2Images, setStage2Images] = useState<any>([]);
   const [projectHouseCoverImageFileList, setProjectHouseCoverImageFileList] =
     useState<any>([]);
   const [
     projectHouseDisplayImageFileList,
     setProjectHouseDisplayImageFileList,
   ] = useState<any>([]);
+  const [stage2Images, setStage2Images] = useState<any>([]);
   const [videoLinks, setVideoLinks] = useState<string[]>([""]);
   const [form] = Form.useForm();
 
-  const {
-    data: getAllPageBySlugData,
-    isLoading: getAllPageBySlugIsLoading,
-    isError: getAllPageBySlugIsError,
-    error: getAllPageBySlugError,
-    refetch: getAllPageBySlugRefetch,
-  } = useGetPageBySlugQuery("projects", {
-    refetchOnMountOrArgChange: true,
-    refetchOnReconnect: true,
-    refetchOnFocus: true,
-  });
+  const { data: getAllPageBySlugData, refetch: getAllPageBySlugRefetch } =
+    useGetPageBySlugQuery("projects", {
+      refetchOnMountOrArgChange: true,
+      refetchOnReconnect: true,
+      refetchOnFocus: true,
+    });
 
   const [
     createBulkProjectFn,
@@ -489,6 +484,7 @@ const page = (props: Props) => {
                   accept="image/*"
                   fileList={projectHouseCoverImageFileList}
                   onChange={handleUploadChangeProjectHouseCoverImage}
+                  maxCount={1}
                 >
                   <PlusOutlined />
                 </Upload>
@@ -514,6 +510,7 @@ const page = (props: Props) => {
                   accept="image/*"
                   fileList={projectHouseDisplayImageFileList}
                   onChange={handleUploadChangeProjectHouseDisplayImage}
+                  maxCount={1}
                 >
                   <PlusOutlined />
                 </Upload>
