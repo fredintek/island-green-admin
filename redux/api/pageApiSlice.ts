@@ -31,6 +31,43 @@ export const pageApiSlice = apiSlice.injectEndpoints({
         body,
       }),
     }),
+
+    // Create a bulk 360 Page
+    createBulk360Page: builder.mutation({
+      query: (body) => ({
+        url: "/page/bulk-360",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    // Create a bulk About Page
+    createBulkAboutPage: builder.mutation({
+      query: (body) => ({
+        url: "/page/bulk-about",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    // Update a bulk 360 Page
+    updateBulk360Page: builder.mutation({
+      query: (body) => ({
+        url: "/page/bulk-360",
+        method: "PATCH",
+        body,
+      }),
+    }),
+
+    // Update a bulk 360 Page
+    updateBulkAboutPage: builder.mutation({
+      query: (body) => ({
+        url: "/page/bulk-about",
+        method: "PATCH",
+        body,
+      }),
+    }),
+
     // Update a Page
     updatePage: builder.mutation({
       query: (body) => ({
@@ -60,6 +97,7 @@ export const pageApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetAllPagesQuery,
   useGetPageByIdQuery,
+  useLazyGetPageByIdQuery,
   useCreatePageMutation,
   useUpdatePageMutation,
   useDeletePageMutation,
@@ -67,4 +105,8 @@ export const {
   useLazyGetPageBySlugQuery,
   useCreateBulkProjectPageMutation,
   useDeleteBulkProjectMutation,
+  useCreateBulk360PageMutation,
+  useUpdateBulk360PageMutation,
+  useCreateBulkAboutPageMutation,
+  useUpdateBulkAboutPageMutation,
 } = pageApiSlice;

@@ -199,7 +199,9 @@ const Sidebar = (props: Props) => {
       if (
         page.subPages.length > 0 &&
         page.slug !== "blog" &&
-        page.slug !== "projects"
+        page.slug !== "projects" &&
+        page.slug !== "about" &&
+        page.slug !== "360"
       ) {
         menuItem.items = page.subPages.map((subPage) => ({
           key: subPage.slug,

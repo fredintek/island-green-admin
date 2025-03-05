@@ -121,13 +121,7 @@ const page = (props: Props) => {
 
   const [
     deleteFileFromCloudinaryFn,
-    {
-      isError: deleteFileFromCloudinaryIsError,
-      isLoading: deleteFileFromCloudinaryIsLoading,
-      isSuccess: deleteFileFromCloudinaryIsSuccess,
-      error: deleteFileFromCloudinaryError,
-      data: deleteFileFromCloudinaryData,
-    },
+    { isLoading: deleteFileFromCloudinaryIsLoading },
   ] = useDeleteFileFromCloudinaryMutation();
 
   const [
