@@ -1,8 +1,8 @@
 "use client";
 import { Link } from "@/i18n/routing";
-import { useLoginMutation } from "@/redux/api/authApiSlice";
+import { useLoginMutation } from "@/redux/api";
 import { LoginOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
+import { Form, Input } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import Password from "antd/es/input/Password";
 import React from "react";
@@ -22,8 +22,7 @@ const customizeRequiredMark = (
 const page = (props: Props) => {
   const [form] = Form.useForm();
 
-  const [login, { isError, isLoading, isSuccess, data, error }] =
-    useLoginMutation();
+  const [login] = useLoginMutation();
 
   const handleSubmit = (values: any) => {
     login({ email: values.email, password: values.password });

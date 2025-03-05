@@ -12,6 +12,24 @@ export const userApiSlice = apiSlice.injectEndpoints({
       query: (id) => `/users/${id}`,
     }),
 
+    // create user
+    createUser: builder.mutation({
+      query: (body) => ({
+        url: "/auth/create",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    // Update User details
+    updateUser: builder.mutation({
+      query: (body) => ({
+        url: `/auth/user-update`,
+        method: "PATCH",
+        body,
+      }),
+    }),
+
     // Update User Role
     updateUserRole: builder.mutation({
       query: ({ userId, role }) => ({
@@ -36,4 +54,6 @@ export const {
   useGetUserByIdQuery,
   useUpdateUserRoleMutation,
   useDeleteUserMutation,
+  useCreateUserMutation,
+  useUpdateUserMutation,
 } = userApiSlice;

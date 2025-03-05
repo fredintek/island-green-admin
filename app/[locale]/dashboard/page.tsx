@@ -6,5 +6,5 @@ export default async function LocaleRedirect({
   params: { locale: string };
 }) {
   const { locale } = await params;
-  redirect(`/${locale}/dashboard/home`);
+  redirect(`/${locale}/dashboard/users`);
 }

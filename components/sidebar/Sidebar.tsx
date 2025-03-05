@@ -2,7 +2,6 @@
 import { Link, usePathname } from "@/i18n/routing";
 import { useAppSelector } from "@/redux/store";
 import {
-  FileOutlined,
   FolderOutlined,
   HomeOutlined,
   IdcardOutlined,
@@ -11,13 +10,15 @@ import {
   QuestionOutlined,
   ReadOutlined,
   RotateLeftOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { ConfigProvider, Menu, Tooltip } from "antd";
 import React, { JSX, useEffect, useState } from "react";
 import { useGetAllPagesQuery } from "@/redux/api/pageApiSlice";
 import { Page } from "@/utils/interfaces";
 import { useLocale } from "next-intl";
-import { useLogoutMutation } from "@/redux/api/authApiSlice";
+import { customPages } from "@/constants/sidebar.constant";
+import { useLogoutMutation } from "@/redux/api";
 
 type Props = {};
 
@@ -35,6 +36,8 @@ const getIcon = (slug: string): JSX.Element => {
       return <ReadOutlined />;
     case "faq":
       return <QuestionOutlined />;
+    case "users":
+      return <UserOutlined />;
     case "communication":
       return <PhoneOutlined className="rotate-180" />;
     default:
@@ -50,113 +53,6 @@ type MenuItem = {
   items?: MenuItem[];
 };
 
-const menuItems = [
-  {
-    key: "home",
-    label: "Home",
-    icon: <HomeOutlined />,
-    link: "/dashboard",
-  },
-  {
-    key: "about",
-    label: "About",
-    icon: <IdcardOutlined />,
-    items: [
-      {
-        key: "about-who",
-        label: "Who Are We",
-        link: "/dashboard/about/who-are-we",
-      },
-      { key: "about-news", label: "News", link: "/dashboard/about/news" },
-    ],
-  },
-  {
-    key: "projects",
-    label: "Projects",
-    icon: <FolderOutlined />,
-    items: [
-      {
-        key: "projects-green-and-blue",
-        label: "Green And Blue",
-        link: "/dashboard/projects/green-and-blue",
-      },
-      {
-        key: "projects-yalusa-homes",
-        label: "Yalusa Homes",
-        link: "/dashboard/projects/yalusa-homes",
-      },
-      {
-        key: "projects-aquamarine",
-        label: "Aquamarine Bosphorus Mansion",
-        link: "/dashboard/projects/aquamarine",
-      },
-    ],
-  },
-  {
-    key: "360",
-    label: "360",
-    icon: <RotateLeftOutlined />,
-    items: [
-      {
-        key: "360-green-and-blue",
-        label: "Green And Blue",
-        link: "/dashboard/360/green-and-blue",
-      },
-      {
-        key: "360-yalusa-homes",
-        label: "Yalusa Homes",
-        link: "/dashboard/360/yalusa-homes",
-      },
-      {
-        key: "360-aquamarine",
-        label: "Aquamarine Bosphorus Mansion",
-        link: "/dashboard/360/aquamarine",
-      },
-    ],
-  },
-  {
-    key: "blog",
-    label: "Blog",
-    icon: <ReadOutlined />,
-    items: [
-      {
-        key: "north-cyprus-about",
-        label: "About Northern Cyprus",
-        link: "/dashboard/blog/north-cyprus-about",
-      },
-      {
-        key: "secret-paradise",
-        label: "The Hidden Paradise of Northern Cyprus:Karpaz Peninsula",
-        link: "/dashboard/blog/secret-paradise",
-      },
-      {
-        key: "buying-guide",
-        label:
-          "Real Estate Buying Guide in Northern Cyprus:Investment and Living Opportunities",
-        link: "/dashboard/blog/buying-guide",
-      },
-      {
-        key: "investment-opportunities",
-        label:
-          "Investment Opportunities in Northern Cyprus:The Shining Future of the Sunny Island",
-        link: "/dashboard/blog/investment-opportunities",
-      },
-    ],
-  },
-  {
-    key: "faq",
-    label: "FAQ",
-    icon: <QuestionOutlined />,
-    link: "/dashboard/faq",
-  },
-  {
-    key: "communication",
-    label: "Communication",
-    icon: <PhoneOutlined className="rotate-180" />,
-    link: "/dashboard/communication",
-  },
-];
-
 const Sidebar = (props: Props) => {
   const { isNavCollapsed } = useAppSelector((state) => state.sidebar);
   const [activeTopKey, setActiveTopKey] = useState("/");
@@ -164,24 +60,9 @@ const Sidebar = (props: Props) => {
   const [activeSubKey, setActiveSubKey] = useState<string | null>(null);
   const pathname = usePathname();
   const locale = useLocale() as "en" | "ru" | "tr";
-  const [
-    logoutFn,
-    {
-      isError: logoutIsError,
-      isLoading: logoutIsLoading,
-      isSuccess: logoutIsSuccess,
-      error: logoutError,
-      data: logoutData,
-    },
-  ] = useLogoutMutation(undefined);
+  const [logoutFn] = useLogoutMutation(undefined);
 
-  const {
-    data: getAllPagesData,
-    isError: getAllPagesIsError,
-    isLoading: getAllPagesIsLoading,
-    isSuccess: getAllPagesIsSuccess,
-    error: getAllPagesError,
-  } = useGetAllPagesQuery(undefined, {
+  const { data: getAllPagesData } = useGetAllPagesQuery(undefined, {
     refetchOnFocus: true,
     refetchOnReconnect: true,
     refetchOnMountOrArgChange: true,
@@ -191,7 +72,7 @@ const Sidebar = (props: Props) => {
     return pages?.map((page) => {
       const menuItem: MenuItem = {
         key: page.slug,
-        label: page.title[locale], // Assuming English as the default label
+        label: page.title[locale],
         icon: getIcon(page.slug),
       };
 
@@ -251,12 +132,13 @@ const Sidebar = (props: Props) => {
 
   useEffect(() => {
     // Find active top-level menu item
-    const activeMenuItem = mapPagesToMenuItems(getAllPagesData)?.find(
-      (item) => {
-        if (item.link) return pathname === item.link;
-        return item.items?.some((subItem) => pathname === subItem.link);
-      }
-    );
+    const activeMenuItem = mapPagesToMenuItems([
+      ...customPages,
+      ...getAllPagesData,
+    ])?.find((item) => {
+      if (item.link) return pathname === item.link;
+      return item.items?.some((subItem) => pathname === subItem.link);
+    });
 
     // Extract submenu key if applicable
     const activeSubItem = activeMenuItem?.items?.find(
@@ -300,7 +182,9 @@ const Sidebar = (props: Props) => {
             theme="light"
             inlineCollapsed={isNavCollapsed}
             className="text-base !bg-white dark:!bg-[#1e293b]"
-            items={renderMenuItems(mapPagesToMenuItems(getAllPagesData))}
+            items={renderMenuItems(
+              mapPagesToMenuItems([...customPages, ...getAllPagesData])
+            )}
             openKeys={openKeys}
             onOpenChange={handleOpenChange}
             selectedKeys={activeSubKey ? [activeSubKey] : [activeTopKey]}

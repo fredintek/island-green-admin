@@ -8,7 +8,6 @@ import {
 import { RootState } from "../store";
 import { toast } from "react-toastify";
 import { logoutUser, setAccessToken } from "../slices/authSlice";
-import { authApiSlice } from "./authApiSlice";
 
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
@@ -54,7 +53,7 @@ const baseQueryWithReauth: BaseQueryFn<
       };
       // Call the logout mutation
       await api
-        .dispatch(authApiSlice.endpoints.logout.initiate(undefined))
+        .dispatch(apiSlice.endpoints.logout.initiate(undefined))
         .unwrap();
 
       // Clear user state
@@ -83,10 +82,51 @@ const baseQueryWithReauth: BaseQueryFn<
 };
 
 // Define a base URL for your API
-export const apiSlice = createApi({
+const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  endpoints: (builder) => ({}),
+  endpoints: (builder) => ({
+    // login admin
+    login: builder.mutation({
+      query: ({ email, password }) => ({
+        url: "/auth/sign-in",
+        method: "POST",
+        body: { email, password },
+      }),
+    }),
+
+    // logout
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+    }),
+
+    // forgot password
+    forgotPassword: builder.mutation({
+      query: ({ email }) => ({
+        url: "/auth/forgot-password",
+        method: "PATCH",
+        body: { email },
+      }),
+    }),
+
+    resetPassword: builder.mutation({
+      query: ({ token, email, password }) => ({
+        url: `/auth/reset-password/`,
+        method: "PATCH",
+        body: { token, email, password },
+      }),
+    }),
+  }),
 });
+
+export const {
+  useLoginMutation,
+  useForgotPasswordMutation,
+  useLogoutMutation,
+  useResetPasswordMutation,
+} = apiSlice;
 
 export default apiSlice;

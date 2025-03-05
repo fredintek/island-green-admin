@@ -8,11 +8,11 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
+import apiSlice from "./api";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { authReducer, navbarReducer } from "./slices";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import apiSlice from "./api";
 
 type NoopStorage = {
   getItem: (key: string) => Promise<null>;

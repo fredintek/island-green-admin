@@ -1,6 +1,6 @@
+import apiSlice from "../api";
 import { UserRole } from "@/constants/auth.constant";
 import { createSlice } from "@reduxjs/toolkit";
-import { authApiSlice } from "../api/authApiSlice";
 import { toast } from "react-toastify";
 
 type UserType = {
@@ -42,37 +42,25 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addMatcher(
-        authApiSlice.endpoints.login.matchFulfilled,
-        (state, action) => {
-          state.token = action.payload.accessToken;
-          state.user = action.payload.user;
-          toast.success(action.payload.message);
-          window.location.reload();
-        }
-      )
-      .addMatcher(
-        authApiSlice.endpoints.login.matchRejected,
-        (state, action) => {
-          const errData = action.payload?.data as LoginErrorResponse;
-          toast.error(errData?.message);
-        }
-      )
-      .addMatcher(
-        authApiSlice.endpoints.logout.matchFulfilled,
-        (state, action) => {
-          state.user = {};
-          state.token = "";
-          window.location.reload();
-        }
-      )
-      .addMatcher(
-        authApiSlice.endpoints.logout.matchRejected,
-        (state, action) => {
-          const errData = action.payload?.data as LoginErrorResponse;
-          toast.error(errData?.message);
-        }
-      );
+      .addMatcher(apiSlice.endpoints.login.matchFulfilled, (state, action) => {
+        state.token = action.payload.accessToken;
+        state.user = action.payload.user;
+        toast.success(action.payload.message);
+        window.location.reload();
+      })
+      .addMatcher(apiSlice.endpoints.login.matchRejected, (state, action) => {
+        const errData = action.payload?.data as LoginErrorResponse;
+        toast.error(errData?.message);
+      })
+      .addMatcher(apiSlice.endpoints.logout.matchFulfilled, (state, action) => {
+        state.user = {};
+        state.token = "";
+        window.location.reload();
+      })
+      .addMatcher(apiSlice.endpoints.logout.matchRejected, (state, action) => {
+        const errData = action.payload?.data as LoginErrorResponse;
+        toast.error(errData?.message);
+      });
   },
 });
 

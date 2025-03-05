@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "@/i18n/routing";
-import { useForgotPasswordMutation } from "@/redux/api/authApiSlice";
+import { useForgotPasswordMutation } from "@/redux/api";
 import { UnlockOutlined } from "@ant-design/icons";
 import { Form, Input } from "antd";
 import FormItem from "antd/es/form/FormItem";
